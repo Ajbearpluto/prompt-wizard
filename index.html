@@ -259,7 +259,8 @@
                 throw new Error("No API Key");
             }
 
-            const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${state.apiKey}`;
+            // 【重要修正：已替換為 -latest 後綴模型端點】
+            const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${state.apiKey}`;
             
             // 如果需要回傳 JSON，在 Prompt 中強烈暗示格式
             let finalPrompt = prompt;
