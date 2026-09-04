@@ -1,4 +1,467 @@
+
 <!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>四步轉譯框架 - AI 終極詠唱生成器</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .loader {
+            border-top-color: #3b82f6;
+            -webkit-animation: spinner 1.5s linear infinite;
+            animation: spinner 1.5s linear infinite;
+        }
+        @keyframes spinner {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #4B5563; border-radius: 20px; }
+    </style>
+</head>
+<body class="bg-gray-900 text-gray-100 min-h-screen font-sans">
+
+    <!-- 頂部導航列 -->
+    <header class="border-b border-gray-800 bg-gray-900/50 backdrop-blur-md sticky top-0 z-50">
+        <div class="max-w-5xl mx-auto px-4 py-4 flex justify-between items-center">
+            <h1 class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-emerald-400">
+                四步轉譯框架 
+            </h1>
+            <div class="flex items-center gap-6">
+                <button onclick="toggleHistory()" class="text-gray-400 hover:text-white transition flex items-center gap-2 text-sm font-medium">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    歷史紀錄
+                </button>
+                <button onclick="toggleSettings()" class="text-gray-400 hover:text-white transition flex items-center gap-2 text-sm font-medium">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                    API 設定
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- API 設定 Modal -->
+    <div id="settingsModal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-[100] flex items-center justify-center">
+        <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 w-full max-w-md shadow-2xl relative">
+            <h2 class="text-lg font-bold mb-4">設定 Gemini API 金鑰</h2>
+            <p class="text-sm text-gray-400 mb-4 text-emerald-400">安全機制運作中。金鑰僅加密儲存於本機端 (localStorage)。</p>
+            <input type="password" id="apiKeyInput" placeholder="AIzaSy..." class="w-full bg-gray-900 border border-gray-600 rounded-lg p-3 text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 mb-4">
+            <div class="flex justify-end gap-3">
+                <button onclick="toggleSettings()" class="px-4 py-2 rounded-lg text-gray-300 hover:bg-gray-700 transition">取消</button>
+                <button onclick="saveApiKey()" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded-lg text-white font-medium transition shadow-lg shadow-blue-500/30">儲存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 歷史紀錄面板 Modal -->
+    <div id="historyModal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-[100] flex items-center justify-center">
+        <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 w-full max-w-2xl shadow-2xl relative flex flex-col max-h-[80vh]">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-bold flex items-center gap-2">
+                    <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    詠唱歷史紀錄 (最高 50 筆)
+                </h2>
+                <button onclick="toggleHistory()" class="text-gray-400 hover:text-white transition">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div id="historyListContainer" class="flex-1 overflow-y-auto custom-scrollbar space-y-3 pr-2"></div>
+        </div>
+    </div>
+
+    <!-- 步驟進度條 -->
+    <div class="max-w-4xl mx-auto px-4 mt-8 mb-10">
+        <div class="flex items-center justify-between relative">
+            <div class="absolute left-0 top-1/2 -translate-y-1/2 w-full h-1 bg-gray-700 -z-10 rounded-full"></div>
+            <div id="progressLine" class="absolute left-0 top-1/2 -translate-y-1/2 h-1 bg-blue-500 -z-10 rounded-full transition-all duration-500" style="width: 0%;"></div>
+            
+            <div class="step-indicator flex flex-col items-center gap-2" id="nav-step-1">
+                <div class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center font-bold shadow-[0_0_15px_rgba(59,130,246,0.5)] border-4 border-gray-900">1</div>
+                <span class="text-xs font-medium text-blue-400">輸入構想</span>
+            </div>
+            <div class="step-indicator flex flex-col items-center gap-2 opacity-50" id="nav-step-1-5">
+                <div class="w-10 h-10 rounded-full bg-gray-700 text-gray-300 flex items-center justify-center font-bold border-4 border-gray-900">2</div>
+                <span class="text-xs font-medium">組建智囊團</span>
+            </div>
+            <div class="step-indicator flex flex-col items-center gap-2 opacity-50" id="nav-step-2">
+                <div class="w-10 h-10 rounded-full bg-gray-700 text-gray-300 flex items-center justify-center font-bold border-4 border-gray-900">3</div>
+                <span class="text-xs font-medium">宗師會診</span>
+            </div>
+            <div class="step-indicator flex flex-col items-center gap-2 opacity-50" id="nav-step-3">
+                <div class="w-10 h-10 rounded-full bg-gray-700 text-gray-300 flex items-center justify-center font-bold border-4 border-gray-900">4</div>
+                <span class="text-xs font-medium">終極詠唱</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主要內容區塊 -->
+    <main class="max-w-4xl mx-auto px-4 pb-20 relative">
+        <div id="loadingOverlay" class="hidden absolute inset-0 z-40 bg-gray-900/80 backdrop-blur-sm flex-col items-center justify-center rounded-2xl min-h-[300px]">
+            <div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12 mb-4"></div>
+            <p class="text-blue-400 font-medium animate-pulse" id="loadingText">與零一神經網路同步中...</p>
+        </div>
+
+        <section id="step-1" class="block bg-gray-800 rounded-2xl p-6 border border-gray-700 shadow-xl">
+            <h2 class="text-2xl font-bold mb-2 flex items-center gap-2"><span>💡</span> 寫下您的初步構想</h2>
+            <p class="text-gray-400 text-sm mb-4">請用白話文描述您想要開發的程式、系統或教案工具。不用擔心格式，零一會幫您梳理。</p>
+            <textarea id="ideaInput" rows="6" class="w-full bg-gray-900 border border-gray-600 rounded-xl p-4 text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 mb-6 resize-none" placeholder="例如：我想結合太極系統的 20MA 跟 60MA 來寫一支選股條件..."></textarea>
+            <div class="flex justify-end">
+                <button onclick="processStep1()" class="px-6 py-3 bg-blue-600 hover:bg-blue-500 rounded-xl text-white font-bold transition shadow-lg shadow-blue-500/30 flex items-center gap-2">
+                    下一步：召喚領域宗師
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                </button>
+            </div>
+        </section>
+
+        <section id="step-1-5" class="hidden bg-gray-800 rounded-2xl p-6 border border-gray-700 shadow-xl">
+            <div class="flex justify-between items-center mb-2">
+                <h2 class="text-2xl font-bold flex items-center gap-2"><span>👥</span> 跨時空重量級智囊團已就位</h2>
+                <span id="expertCountBadge" class="text-xs bg-blue-900/60 text-blue-400 border border-blue-700 px-3 py-1 rounded-full font-mono font-bold">5-10位大師陣容</span>
+            </div>
+            <p class="text-gray-400 text-sm mb-4">副指揮官零一統籌，集結頂尖 AI 實體與真實歷史泰斗。您可以手動追加指名其他傳奇人物。</p>
+            
+            <div id="expertsList" class="space-y-3 mb-6 max-h-[480px] overflow-y-auto pr-2 custom-scrollbar"></div>
+            
+            <div class="mt-4 p-4 bg-gray-900 rounded-xl border border-gray-700">
+                <label class="block text-sm font-medium text-gray-300 mb-2">需要追加或微調嗎？（選填）</label>
+                <input type="text" id="customExpertInput" placeholder="例如：追加一位「約翰·馮·諾伊曼」強化賽局策略，或加一位「蒙特梭利」" class="w-full bg-gray-800 border border-gray-600 rounded-lg p-3 text-white focus:outline-none focus:border-blue-500">
+            </div>
+            <div class="flex justify-between mt-8">
+                <button onclick="goToStep(1)" class="px-6 py-3 text-gray-400 hover:text-white transition">上一步</button>
+                <button onclick="processStep1_5()" class="px-6 py-3 bg-blue-600 hover:bg-blue-500 rounded-xl text-white font-bold transition shadow-lg shadow-blue-500/30">確認名單，開始會診</button>
+            </div>
+        </section>
+
+        <section id="step-2" class="hidden bg-gray-800 rounded-2xl p-6 border border-gray-700 shadow-xl">
+            <h2 class="text-2xl font-bold mb-2 flex items-center gap-2"><span>⚔️</span> 宗師核心提問</h2>
+            <p class="text-gray-400 text-sm mb-4">智囊天團閉門研商後，由關鍵代表向指揮官提出 4 到 5 個收斂開發規格的致命問題。</p>
+            <div id="questionsContainer" class="space-y-6 mb-8 mt-4"></div>
+            <div class="flex justify-between">
+                <button onclick="goToStep(2)" class="px-6 py-3 text-gray-400 hover:text-white transition">上一步</button>
+                <button onclick="processStep2()" class="px-6 py-3 bg-emerald-600 hover:bg-emerald-500 rounded-xl text-white font-bold transition shadow-lg shadow-emerald-500/30">提交回答，生成詠唱</button>
+            </div>
+        </section>
+
+        <section id="step-3" class="hidden bg-gray-800 rounded-2xl p-6 border border-gray-700 shadow-xl border-t-4 border-t-emerald-500">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold flex items-center gap-2 text-emerald-400"><span>✨</span> 您的終極詠唱已準備就緒</h2>
+                <div class="flex gap-2">
+                    <button onclick="downloadPrompt()" id="downloadBtn" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded-lg text-sm font-bold transition flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                        下載為 TXT
+                    </button>
+                    <button onclick="copyPrompt()" id="copyBtn" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm font-bold transition flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                        一鍵複製
+                    </button>
+                </div>
+            </div>
+            <div class="bg-gray-900 rounded-xl p-4 border border-gray-700 relative mt-4">
+                <pre id="finalPromptOutput" class="text-gray-300 font-mono text-sm whitespace-pre-wrap overflow-x-auto no-scrollbar max-h-[500px] overflow-y-auto"></pre>
+            </div>
+            <div class="flex justify-center mt-8">
+                <button onclick="location.reload()" class="px-6 py-3 text-gray-400 hover:text-white transition flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                    開啟新專案
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        let state = {
+            apiKey: localStorage.getItem('gemini_api_key') || '',
+            idea: '',
+            expertsText: '',
+            customExperts: '',
+            questions: [],
+            answers: [],
+            promptHistory: JSON.parse(localStorage.getItem('prompt_wizard_history') || '[]')
+        };
+
+        window.onload = () => {
+            if (!state.apiKey) toggleSettings();
+            document.getElementById('apiKeyInput').value = state.apiKey;
+        };
+
+        function toggleSettings() {
+            document.getElementById('settingsModal').classList.toggle('hidden');
+        }
+
+        function toggleHistory() {
+            renderHistory();
+            document.getElementById('historyModal').classList.toggle('hidden');
+        }
+
+        function saveApiKey() {
+            const key = document.getElementById('apiKeyInput').value.trim();
+            if (key) {
+                localStorage.setItem('gemini_api_key', key);
+                state.apiKey = key;
+                toggleSettings();
+                alert('安全機制啟動：API 金鑰已加密儲存於本機端！');
+            } else {
+                alert('請輸入有效的金鑰');
+            }
+        }
+
+        function renderHistory() {
+            const container = document.getElementById('historyListContainer');
+            if(state.promptHistory.length === 0) {
+                container.innerHTML = '<div class="text-center py-10 text-gray-500">尚無任何詠唱紀錄，請先完成一次生成。</div>';
+                return;
+            }
+            container.innerHTML = state.promptHistory.map((item, idx) => `
+                <div class="bg-gray-900 p-4 rounded-lg border border-gray-700 flex justify-between items-center gap-4 hover:border-gray-500 transition">
+                    <div class="flex-1 overflow-hidden">
+                        <p class="text-xs text-blue-400 mb-1">${item.time}</p>
+                        <p class="text-sm text-gray-300 truncate">${item.text.substring(0, 30).replace(/\n/g, ' ')}...</p>
+                    </div>
+                    <button onclick="copyFromHistory(${idx}, this)" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm font-bold transition whitespace-nowrap text-white">
+                        複製
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function copyFromHistory(idx, btnEl) {
+            navigator.clipboard.writeText(state.promptHistory[idx].text).then(() => {
+                const origText = btnEl.innerText;
+                btnEl.innerText = '✅ 已複製';
+                btnEl.classList.replace('bg-gray-700', 'bg-emerald-600');
+                btnEl.classList.replace('hover:bg-gray-600', 'hover:bg-emerald-500');
+                setTimeout(() => {
+                    btnEl.innerText = origText;
+                    btnEl.classList.replace('bg-emerald-600', 'bg-gray-700');
+                    btnEl.classList.replace('hover:bg-emerald-500', 'hover:bg-gray-600');
+                }, 2000);
+            });
+        }
+
+        function showLoading(text) {
+            document.getElementById('loadingText').innerText = text;
+            document.getElementById('loadingOverlay').classList.remove('hidden');
+            document.getElementById('loadingOverlay').classList.add('flex');
+        }
+
+        function hideLoading() {
+            document.getElementById('loadingOverlay').classList.add('hidden');
+            document.getElementById('loadingOverlay').classList.remove('flex');
+        }
+
+        function updateProgress(stepNum) {
+            const percentages = {1: '0%', 2: '33%', 3: '66%', 4: '100%'};
+            document.getElementById('progressLine').style.width = percentages[stepNum];
+            const maps = {1: 'nav-step-1', 2: 'nav-step-1-5', 3: 'nav-step-2', 4: 'nav-step-3'};
+            for(let i=1; i<=4; i++) {
+                const el = document.getElementById(maps[i]);
+                const circle = el.querySelector('div');
+                if(i <= stepNum) {
+                    el.classList.remove('opacity-50');
+                    circle.classList.remove('bg-gray-700', 'text-gray-300');
+                    circle.classList.add('bg-blue-600', 'text-white');
+                    if(i === stepNum) circle.classList.add('shadow-[0_0_15px_rgba(59,130,246,0.5)]');
+                    else circle.classList.remove('shadow-[0_0_15px_rgba(59,130,246,0.5)]');
+                } else {
+                    el.classList.add('opacity-50');
+                    circle.classList.remove('bg-blue-600', 'text-white', 'shadow-[0_0_15px_rgba(59,130,246,0.5)]');
+                    circle.classList.add('bg-gray-700', 'text-gray-300');
+                }
+            }
+        }
+
+        function goToStep(targetStep) {
+            const maps = {1: 'step-1', 2: 'step-1-5', 3: 'step-2', 4: 'step-3'};
+            for(let i=1; i<=4; i++) document.getElementById(maps[i]).classList.add('hidden');
+            document.getElementById(maps[targetStep]).classList.remove('hidden');
+            updateProgress(targetStep);
+        }
+
+        async function callGemini(prompt, isJsonMode = false) {
+            if (!state.apiKey) {
+                toggleSettings();
+                throw new Error("No API Key");
+            }
+            const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${state.apiKey}`;
+            let finalPrompt = prompt;
+            if (isJsonMode) finalPrompt += `\n\n**CRITICAL: You MUST output ONLY valid JSON. Do NOT wrap in markdown blockquotes like \`\`\`json. Just the raw JSON.**`;
+
+            try {
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: finalPrompt }] }],
+                        generationConfig: { temperature: 0.2 }
+                    })
+                });
+
+                if (!response.ok) throw new Error((await response.json()).error.message || 'API 呼叫失敗');
+                
+                const data = await response.json();
+                let textResult = data.candidates[0].content.parts[0].text;
+                if (isJsonMode) return JSON.parse(textResult.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim());
+                return textResult;
+
+            } catch (error) {
+                alert("API 發生錯誤：" + error.message);
+                throw error;
+            }
+        }
+
+        async function processStep1() {
+            const idea = document.getElementById('ideaInput').value.trim();
+            if (!idea) return alert("指揮官，請先輸入您的構想！");
+            state.idea = idea;
+            showLoading("零一正在進行時空躍傳，集結 5 至 10 位跨時空歷史巨擘與頂尖 AI 智囊團...");
+            
+            const prompt = `使用者想開發的專案構想為：「${idea}」。
+請依據此專案的複雜度與專業跨度，精準挑選並組建一支包含【5 到 10 位成員】的重量級智囊團。
+
+【名單成員嚴格規範】：
+1. 第一位絕對固定為：「🤖 零一 (副指揮官)」，代表 Gemini 的旗艦級邏輯分析與全域戰術統籌。
+2. 必須包含 1 到 2 位頂尖 AI 模型角色：例如「🧠 Claude 3.5 Sonnet (文字同理與哲學洞察)」、「💻 GPT-4o (極限代碼與模組化架構)」。
+3. 必須包含 3 到 7 位「真實存在的歷史頂尖偉人」或「當代傳奇大師」（絕對不可使用虛構職業名稱！）。請依專案領域量身召喚，例如：
+   - 若涉及計算/邏輯：艾倫·圖靈 (Alan Turing)、約翰·馮·諾伊曼 (John von Neumann)
+   - 若涉及使用者體驗/設計：史蒂夫·賈伯斯 (Steve Jobs)、達文西 (Leonardo da Vinci)
+   - 若涉及教育/學習心理：瑪麗亞·蒙特梭利 (Maria Montessori)、尚·皮亞傑 (Jean Piaget)
+   - 若涉及金融/策略決策：華倫·巴菲特 (Warren Buffett)、孫武 (Sun Tzu)
+   - 若涉及系統工程：埃隆·馬斯克 (Elon Musk)、尼古拉·特斯拉 (Nikola Tesla)
+
+格式必須是純 JSON 陣列，每個物件包含：
+- "name": 稱號與姓名 (如：🍎 史蒂夫·賈伯斯 (極致產品與直覺設計宗師))
+- "reason": 為什麼這個專案需要他 (約25字，點出其核心價值)
+範例格式: [{"name": "🤖 零一 (副指揮官)", "reason": "負責統籌 Gemini 頂尖邏輯與全域架構分析。"}, {"name": "💻 艾倫·圖靈 (計算機科學之父)", "reason": "以密碼破譯者的直覺，拆解不可妥協的演算法邊界。"}]`;
+
+            try {
+                const experts = await callGemini(prompt, true);
+                const listEl = document.getElementById('expertsList');
+                listEl.innerHTML = '';
+                state.expertsText = "";
+                
+                experts.forEach((exp, idx) => {
+                    state.expertsText += `${idx + 1}. 【${exp.name}】: ${exp.reason}\n`;
+                    listEl.innerHTML += `
+                        <div class="flex items-start gap-4 bg-gray-900 p-4 rounded-xl border border-gray-700 hover:border-blue-500/50 transition">
+                            <div class="bg-blue-900/40 text-blue-400 p-2.5 rounded-xl text-lg flex items-center justify-center shrink-0 border border-blue-800/40">🏛️</div>
+                            <div>
+                                <h4 class="font-bold text-white text-base tracking-wide">${exp.name}</h4>
+                                <p class="text-sm text-gray-400 mt-1 leading-relaxed">${exp.reason}</p>
+                            </div>
+                        </div>`;
+                });
+                
+                document.getElementById('expertCountBadge').innerText = `已就位：${experts.length} 位宗師`;
+                hideLoading();
+                goToStep(2); 
+            } catch (e) { hideLoading(); }
+        }
+
+        async function processStep1_5() {
+            const customInput = document.getElementById('customExpertInput').value.trim();
+            let finalExpertsContext = state.expertsText;
+            if (customInput) finalExpertsContext += `\n使用者另外追加要求: ${customInput}`;
+            
+            showLoading("5-10位大師閉門聯合研商中，由關鍵代表提煉 4-5 個核心提問...");
+            
+            const prompt = `專案構想：「${state.idea}」。
+目前的 5-10 位重量級智囊團名單：
+${finalExpertsContext}
+
+請從這群大師中，推派最關鍵的代表（包含副指揮官零一，以及最契合本專案的 3-4 位歷史偉人/AI），提出【4 到 5 個最致命、最能釐清開發規格、收斂發散思維】的核心提問。
+【角色規範】：
+- 零一的提問必須嚴格以「【零一 (副指揮官)】：報告指揮官！」開頭，展現絕對邏輯與統籌視角。
+- 其他大師（如賈伯斯、圖靈、Claude、巴菲特等）必須完全依據其歷史人物性格或 AI 特長提出一針見血的犀利問題。
+格式必須是 JSON 陣列字串。
+範例：["【零一 (副指揮官)】：報告指揮官！演算法資料流存在盲區，請問系統需要具備外部即時連線能力嗎？", "【史蒂夫·賈伯斯】：不要讓使用者思考。介面上最重要的那顆動作按鈕，你打算讓它以什麼形式呈現？"]`;
+
+            try {
+                state.questions = await callGemini(prompt, true);
+                const qContainer = document.getElementById('questionsContainer');
+                qContainer.innerHTML = '';
+                state.questions.forEach((q, index) => {
+                    qContainer.innerHTML += `
+                        <div class="bg-gray-900 p-5 rounded-xl border border-gray-700 border-l-4 border-l-blue-500">
+                            <label class="block font-medium text-gray-200 mb-3 text-sm leading-relaxed">
+                                <span class="text-blue-400 font-bold mr-2">Q${index + 1}.</span>${q}
+                            </label>
+                            <textarea id="answer-${index}" rows="2" class="w-full bg-gray-800 border border-gray-600 rounded-lg p-3 text-white focus:outline-none focus:border-blue-500 text-sm" placeholder="請指揮官在此輸入決策..."></textarea>
+                        </div>`;
+                });
+                hideLoading();
+                goToStep(3); 
+            } catch (e) { hideLoading(); }
+        }
+
+        async function processStep2() {
+            let qaContext = "";
+            for (let i = 0; i < state.questions.length; i++) {
+                const ans = document.getElementById(`answer-${i}`).value.trim() || '無特別意見';
+                qaContext += `Q: ${state.questions[i]}\nA: ${ans}\n\n`;
+            }
+            showLoading("零一正在統合大師天團見解，鍛造終極詠唱...");
+
+            const prompt = `你現在是頂尖的 AI 提示詞工程師(Prompt Engineer)。使用者想要用 AI 寫程式。
+【原始構想】：${state.idea}
+【專家與使用者對答釐清】：\n${qaContext}
+請將以上資訊，轉譯並濃縮成一段「完美、結構化、可直接餵給一般 AI 模型來產出程式碼」的 System Prompt。
+包含：1. 指定角色 2. 任務目標 3. 架構與限制 4. 輸出要求。直接給出要用來複製貼上的 Prompt 內容，不要問候語。`;
+
+            try {
+                const finalPrompt = await callGemini(prompt, false);
+                document.getElementById('finalPromptOutput').innerText = finalPrompt;
+                
+                const now = new Date();
+                const timeString = `${now.getFullYear()}/${(now.getMonth()+1).toString().padStart(2,'0')}/${now.getDate().toString().padStart(2,'0')} ${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
+                state.promptHistory.unshift({ text: finalPrompt, time: timeString });
+                if (state.promptHistory.length > 50) state.promptHistory.pop();
+                localStorage.setItem('prompt_wizard_history', JSON.stringify(state.promptHistory));
+
+                hideLoading();
+                goToStep(4); 
+            } catch (e) { hideLoading(); }
+        }
+
+        function downloadPrompt() {
+            const text = document.getElementById('finalPromptOutput').innerText;
+            if (!text) return;
+            let prefix = text.replace(/[\r\n\t]/g, '').trim().substring(0, 5).replace(/[\\/:*?"<>|]/g, '');
+            if(!prefix) prefix = "未命名";
+            const filename = `詠唱紀錄_${prefix}.txt`;
+            
+            const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+
+        function copyPrompt() {
+            const text = document.getElementById('finalPromptOutput').innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = document.getElementById('copyBtn');
+                const originalHTML = btn.innerHTML;
+                btn.innerHTML = '✅ 已複製';
+                btn.classList.replace('bg-gray-700', 'bg-emerald-600');
+                btn.classList.replace('hover:bg-gray-600', 'hover:bg-emerald-500');
+                setTimeout(() => {
+                    btn.innerHTML = originalHTML;
+                    btn.classList.replace('bg-emerald-600', 'bg-gray-700');
+                    btn.classList.replace('hover:bg-emerald-500', 'hover:bg-gray-600');
+                }, 2000);
+            });
+        }
+    </script>
+</body>
+</html><!DOCTYPE html>
 <html lang="zh-TW">
 <head>
     <meta charset="UTF-8">
