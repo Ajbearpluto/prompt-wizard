@@ -208,8 +208,8 @@
                 throw new Error("No API Key");
             }
 
-            // 【API 串接宗師的修正】：強制使用最穩定的 gemini-pro 基礎模型
-            const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${state.apiKey}`;
+            // 【API 探勘宗師的最終修正】：使用探勘清單中確認可用的 gemini-flash-latest
+            const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${state.apiKey}`;
             
             let finalPrompt = prompt;
             if (isJsonMode) {
