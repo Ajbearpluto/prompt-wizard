@@ -17,7 +17,6 @@
         }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        /* 歷史面板自訂捲軸 */
         .custom-scrollbar::-webkit-scrollbar { width: 6px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #4B5563; border-radius: 20px; }
@@ -32,7 +31,6 @@
                 四步轉譯框架 
             </h1>
             <div class="flex items-center gap-6">
-                <!-- 升級：全域歷史紀錄按鈕 -->
                 <button onclick="toggleHistory()" class="text-gray-400 hover:text-white transition flex items-center gap-2 text-sm font-medium">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                     歷史紀錄
@@ -58,7 +56,7 @@
         </div>
     </div>
 
-    <!-- 升級：歷史紀錄面板 Modal -->
+    <!-- 歷史紀錄面板 Modal -->
     <div id="historyModal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-[100] flex items-center justify-center">
         <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 w-full max-w-2xl shadow-2xl relative flex flex-col max-h-[80vh]">
             <div class="flex justify-between items-center mb-4">
@@ -122,10 +120,11 @@
 
         <section id="step-1-5" class="hidden bg-gray-800 rounded-2xl p-6 border border-gray-700 shadow-xl">
             <h2 class="text-2xl font-bold mb-2 flex items-center gap-2"><span>👥</span> 動態專案智囊團已就位</h2>
+            <p class="text-gray-400 text-sm mb-6 mt-2">歷史級泰斗與頂尖 AI 模型已為您集結。您可以追加指名特定的歷史人物或 AI。</p>
             <div id="expertsList" class="space-y-3 mb-6 mt-4"></div>
             <div class="mt-4 p-4 bg-gray-900 rounded-xl border border-gray-700">
                 <label class="block text-sm font-medium text-gray-300 mb-2">需要追加或調整嗎？（選填）</label>
-                <input type="text" id="customExpertInput" placeholder="例如：幫我加一位「兒童心理學宗師」" class="w-full bg-gray-800 border border-gray-600 rounded-lg p-3 text-white focus:outline-none focus:border-blue-500">
+                <input type="text" id="customExpertInput" placeholder="例如：幫我加一位「蒙特梭利」來評估兒童心理，或是加一位「Claude」負責修飾文字" class="w-full bg-gray-800 border border-gray-600 rounded-lg p-3 text-white focus:outline-none focus:border-blue-500">
             </div>
             <div class="flex justify-between mt-8">
                 <button onclick="goToStep(1)" class="px-6 py-3 text-gray-400 hover:text-white transition">上一步</button>
@@ -145,7 +144,6 @@
         <section id="step-3" class="hidden bg-gray-800 rounded-2xl p-6 border border-gray-700 shadow-xl border-t-4 border-t-emerald-500">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-2xl font-bold flex items-center gap-2 text-emerald-400"><span>✨</span> 您的終極詠唱已準備就緒</h2>
-                <!-- 升級：匯出與複製按鈕群組 -->
                 <div class="flex gap-2">
                     <button onclick="downloadPrompt()" id="downloadBtn" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded-lg text-sm font-bold transition flex items-center gap-2">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
@@ -170,7 +168,6 @@
     </main>
 
     <script>
-        // --- 狀態管理 (加入 promptHistory) ---
         let state = {
             apiKey: localStorage.getItem('gemini_api_key') || '',
             idea: '',
@@ -186,7 +183,6 @@
             document.getElementById('apiKeyInput').value = state.apiKey;
         };
 
-        // --- UI Modal 控制 ---
         function toggleSettings() {
             document.getElementById('settingsModal').classList.toggle('hidden');
         }
@@ -208,7 +204,6 @@
             }
         }
 
-        // --- 歷史紀錄渲染與複製 ---
         function renderHistory() {
             const container = document.getElementById('historyListContainer');
             if(state.promptHistory.length === 0) {
@@ -314,15 +309,19 @@
             }
         }
 
-        // --- 流程控制 ---
+        // --- 流程控制 (升級核心：替換為真實重量級人物與多元AI) ---
         async function processStep1() {
             const idea = document.getElementById('ideaInput').value.trim();
             if (!idea) return alert("指揮官，請先輸入您的構想！");
             state.idea = idea;
-            showLoading("零一正在分析您的構想，尋找最佳宗師...");
+            showLoading("零一正在進行時空躍傳，召喚重量級歷史宗師與頂尖AI模型...");
             
-            const prompt = `使用者想開發的專案構想為：「${idea}」。請根據此專案，分析並回傳 3 位最適合協助開發的虛擬領域宗師。
-格式必須是 JSON 陣列，每個物件包含 "name" (宗師頭銜) 和 "reason" (為何需要他，約20字)。`;
+            // 【重要升級】：禁止召喚虛擬角色，強制召喚真實人物與特定 AI
+            const prompt = `使用者想開發的專案構想為：「${idea}」。請根據此專案，分析並回傳 3 位最適合協助的智囊團成員。
+【嚴格限制】：絕對不可以回傳虛擬的職業名稱（如前端架構師、UI設計師）。這 3 位成員必須是以下兩種身分：
+1. 「真實存在的歷史偉人」或「當代頂尖權威泰斗」（例如：史蒂夫·賈伯斯、艾倫·圖靈、蒙特梭利、巴菲特 等）。
+2. 「具有獨特優勢的真實頂尖 AI 模型」（例如：代表超強邏輯與多模態的 Gemini 零一、代表細膩文字與洞察的 Claude、代表極限編碼的 GPT-4 等）。
+格式必須是 JSON 陣列，每個物件包含 "name" (姓名加上核心稱號，如：🍎 賈伯斯 (極致產品宗師)) 和 "reason" (為何需要他，約20字)。`;
 
             try {
                 const experts = await callGemini(prompt, true);
@@ -333,10 +332,10 @@
                     state.expertsText += `【${exp.name}】: ${exp.reason}\n`;
                     listEl.innerHTML += `
                         <div class="flex items-start gap-4 bg-gray-900 p-4 rounded-xl border border-gray-700">
-                            <div class="bg-blue-900/50 text-blue-400 p-2 rounded-lg">🧙‍♂️</div>
+                            <div class="bg-blue-900/50 text-blue-400 p-2 rounded-lg text-lg flex items-center justify-center">🏛️</div>
                             <div>
-                                <h4 class="font-bold text-white">${exp.name}</h4>
-                                <p class="text-sm text-gray-400">${exp.reason}</p>
+                                <h4 class="font-bold text-white text-lg tracking-wide">${exp.name}</h4>
+                                <p class="text-sm text-gray-400 mt-1">${exp.reason}</p>
                             </div>
                         </div>`;
                 });
@@ -350,9 +349,13 @@
             let finalExpertsContext = state.expertsText;
             if (customInput) finalExpertsContext += `\n使用者另外追加要求: ${customInput}`;
             
-            showLoading("宗師聯合會診中，正在為您提煉關鍵問題...");
+            showLoading("歷史宗師與頂尖 AI 聯合會診中，提煉核心問題...");
+            
+            // 【重要升級】：要求大師們以符合身分的人設語氣提問
             const prompt = `專案構想：「${state.idea}」。目前的智囊團陣容：「${finalExpertsContext}」。
-請扮演這些宗師，針對此專案提出 3-4 個「最核心、能收斂發散思維」的問題。格式必須是 JSON 陣列字串。`;
+請「完全投入」這些宗師或 AI 模型的角色設定，用符合他們歷史人設、性格與專業視角的語氣，針對此專案提出 3-4 個「最犀利、最能釐清開發規格」的核心問題。
+格式必須是 JSON 陣列字串。
+範例：["【圖靈提問】：演算法的本質在於清晰的指令。指揮官，請問您的判斷條件中，有哪幾個變數是不可妥協的絕對常數？", "【Gemini 零一分析】：資料流向存在盲區。請問系統需要具備連線外部 API 獲取即時資料的能力嗎？"]`;
 
             try {
                 state.questions = await callGemini(prompt, true);
@@ -360,9 +363,11 @@
                 qContainer.innerHTML = '';
                 state.questions.forEach((q, index) => {
                     qContainer.innerHTML += `
-                        <div class="bg-gray-900 p-5 rounded-xl border border-gray-700">
-                            <label class="block font-medium text-gray-200 mb-3 text-sm"><span class="text-blue-400 font-bold mr-2">Q${index + 1}.</span>${q}</label>
-                            <textarea id="answer-${index}" rows="2" class="w-full bg-gray-800 border border-gray-600 rounded-lg p-3 text-white focus:outline-none focus:border-blue-500 text-sm" placeholder="請在此輸入您的決策..."></textarea>
+                        <div class="bg-gray-900 p-5 rounded-xl border border-gray-700 border-l-4 border-l-blue-500">
+                            <label class="block font-medium text-gray-200 mb-3 text-sm leading-relaxed">
+                                <span class="text-blue-400 font-bold mr-2">Q${index + 1}.</span>${q}
+                            </label>
+                            <textarea id="answer-${index}" rows="2" class="w-full bg-gray-800 border border-gray-600 rounded-lg p-3 text-white focus:outline-none focus:border-blue-500 text-sm" placeholder="請指揮官在此輸入決策..."></textarea>
                         </div>`;
                 });
                 hideLoading();
@@ -376,7 +381,7 @@
                 const ans = document.getElementById(`answer-${i}`).value.trim() || '無特別意見';
                 qaContext += `Q: ${state.questions[i]}\nA: ${ans}\n\n`;
             }
-            showLoading("零一正在進行科技語言轉譯，生成終極詠唱...");
+            showLoading("零一正在統合大師見解，鍛造終極詠唱...");
 
             const prompt = `你現在是頂尖的 AI 提示詞工程師(Prompt Engineer)。使用者想要用 AI 寫程式。
 【原始構想】：${state.idea}
@@ -388,7 +393,6 @@
                 const finalPrompt = await callGemini(prompt, false);
                 document.getElementById('finalPromptOutput').innerText = finalPrompt;
                 
-                // 升級：自動存入歷史紀錄 (上限 50 筆, FIFO)
                 const now = new Date();
                 const timeString = `${now.getFullYear()}/${(now.getMonth()+1).toString().padStart(2,'0')}/${now.getDate().toString().padStart(2,'0')} ${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
                 state.promptHistory.unshift({ text: finalPrompt, time: timeString });
@@ -404,7 +408,6 @@
         function downloadPrompt() {
             const text = document.getElementById('finalPromptOutput').innerText;
             if (!text) return;
-            // 抓取前5個字作為檔名，若不足5字全取，並清除不合法檔名字元
             let prefix = text.replace(/[\r\n\t]/g, '').trim().substring(0, 5).replace(/[\\/:*?"<>|]/g, '');
             if(!prefix) prefix = "未命名";
             const filename = `詠唱紀錄_${prefix}.txt`;
