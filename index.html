@@ -17,26 +17,39 @@
         }
         .no-scrollbar::-webkit-scrollbar { display: none; }
         .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        /* 歷史面板自訂捲軸 */
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #4B5563; border-radius: 20px; }
     </style>
 </head>
 <body class="bg-gray-900 text-gray-100 min-h-screen font-sans">
 
+    <!-- 頂部導航列 -->
     <header class="border-b border-gray-800 bg-gray-900/50 backdrop-blur-md sticky top-0 z-50">
         <div class="max-w-5xl mx-auto px-4 py-4 flex justify-between items-center">
             <h1 class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-emerald-400">
                 四步轉譯框架 
             </h1>
-            <button onclick="toggleSettings()" class="text-gray-400 hover:text-white transition flex items-center gap-2">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                API 設定
-            </button>
+            <div class="flex items-center gap-6">
+                <!-- 升級：全域歷史紀錄按鈕 -->
+                <button onclick="toggleHistory()" class="text-gray-400 hover:text-white transition flex items-center gap-2 text-sm font-medium">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    歷史紀錄
+                </button>
+                <button onclick="toggleSettings()" class="text-gray-400 hover:text-white transition flex items-center gap-2 text-sm font-medium">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                    API 設定
+                </button>
+            </div>
         </div>
     </header>
 
+    <!-- API 設定 Modal -->
     <div id="settingsModal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-[100] flex items-center justify-center">
         <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 w-full max-w-md shadow-2xl relative">
             <h2 class="text-lg font-bold mb-4">設定 Gemini API 金鑰</h2>
-            <p class="text-sm text-gray-400 mb-4 text-emerald-400">已恢復安全模式。您的金鑰僅會加密儲存在本機瀏覽器 (localStorage)。</p>
+            <p class="text-sm text-gray-400 mb-4 text-emerald-400">安全機制運作中。金鑰僅加密儲存於本機端 (localStorage)。</p>
             <input type="password" id="apiKeyInput" placeholder="AIzaSy..." class="w-full bg-gray-900 border border-gray-600 rounded-lg p-3 text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 mb-4">
             <div class="flex justify-end gap-3">
                 <button onclick="toggleSettings()" class="px-4 py-2 rounded-lg text-gray-300 hover:bg-gray-700 transition">取消</button>
@@ -45,6 +58,25 @@
         </div>
     </div>
 
+    <!-- 升級：歷史紀錄面板 Modal -->
+    <div id="historyModal" class="hidden fixed inset-0 bg-black/70 backdrop-blur-sm z-[100] flex items-center justify-center">
+        <div class="bg-gray-800 p-6 rounded-xl border border-gray-700 w-full max-w-2xl shadow-2xl relative flex flex-col max-h-[80vh]">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-lg font-bold flex items-center gap-2">
+                    <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    詠唱歷史紀錄 (最高 50 筆)
+                </h2>
+                <button onclick="toggleHistory()" class="text-gray-400 hover:text-white transition">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <div id="historyListContainer" class="flex-1 overflow-y-auto custom-scrollbar space-y-3 pr-2">
+                <!-- 動態注入歷史紀錄 -->
+            </div>
+        </div>
+    </div>
+
+    <!-- 步驟進度條 -->
     <div class="max-w-4xl mx-auto px-4 mt-8 mb-10">
         <div class="flex items-center justify-between relative">
             <div class="absolute left-0 top-1/2 -translate-y-1/2 w-full h-1 bg-gray-700 -z-10 rounded-full"></div>
@@ -69,6 +101,7 @@
         </div>
     </div>
 
+    <!-- 主要內容區塊 -->
     <main class="max-w-4xl mx-auto px-4 pb-20 relative">
         <div id="loadingOverlay" class="hidden absolute inset-0 z-40 bg-gray-900/80 backdrop-blur-sm flex-col items-center justify-center rounded-2xl min-h-[300px]">
             <div class="loader ease-linear rounded-full border-4 border-t-4 border-gray-200 h-12 w-12 mb-4"></div>
@@ -78,7 +111,7 @@
         <section id="step-1" class="block bg-gray-800 rounded-2xl p-6 border border-gray-700 shadow-xl">
             <h2 class="text-2xl font-bold mb-2 flex items-center gap-2"><span>💡</span> 寫下您的初步構想</h2>
             <p class="text-gray-400 text-sm mb-4">請用白話文描述您想要開發的程式、系統或教案工具。不用擔心格式，零一會幫您梳理。</p>
-            <textarea id="ideaInput" rows="6" class="w-full bg-gray-900 border border-gray-600 rounded-xl p-4 text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 mb-6 resize-none"></textarea>
+            <textarea id="ideaInput" rows="6" class="w-full bg-gray-900 border border-gray-600 rounded-xl p-4 text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 mb-6 resize-none" placeholder="例如：我想結合太極系統的 20MA 跟 60MA 來寫一支選股條件..."></textarea>
             <div class="flex justify-end">
                 <button onclick="processStep1()" class="px-6 py-3 bg-blue-600 hover:bg-blue-500 rounded-xl text-white font-bold transition shadow-lg shadow-blue-500/30 flex items-center gap-2">
                     下一步：召喚領域宗師
@@ -112,10 +145,17 @@
         <section id="step-3" class="hidden bg-gray-800 rounded-2xl p-6 border border-gray-700 shadow-xl border-t-4 border-t-emerald-500">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-2xl font-bold flex items-center gap-2 text-emerald-400"><span>✨</span> 您的終極詠唱已準備就緒</h2>
-                <button onclick="copyPrompt()" id="copyBtn" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm font-bold transition flex items-center gap-2">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
-                    一鍵複製
-                </button>
+                <!-- 升級：匯出與複製按鈕群組 -->
+                <div class="flex gap-2">
+                    <button onclick="downloadPrompt()" id="downloadBtn" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded-lg text-sm font-bold transition flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                        下載為 TXT
+                    </button>
+                    <button onclick="copyPrompt()" id="copyBtn" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm font-bold transition flex items-center gap-2">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                        一鍵複製
+                    </button>
+                </div>
             </div>
             <div class="bg-gray-900 rounded-xl p-4 border border-gray-700 relative mt-4">
                 <pre id="finalPromptOutput" class="text-gray-300 font-mono text-sm whitespace-pre-wrap overflow-x-auto no-scrollbar max-h-[500px] overflow-y-auto"></pre>
@@ -130,25 +170,30 @@
     </main>
 
     <script>
-        // 【資安防禦宗師的修正】：恢復安全的 localStorage 讀取機制
+        // --- 狀態管理 (加入 promptHistory) ---
         let state = {
             apiKey: localStorage.getItem('gemini_api_key') || '',
             idea: '',
             expertsText: '',
             customExperts: '',
             questions: [],
-            answers: []
+            answers: [],
+            promptHistory: JSON.parse(localStorage.getItem('prompt_wizard_history') || '[]')
         };
 
         window.onload = () => {
-            if (!state.apiKey) {
-                toggleSettings(); // 如果沒讀到鑰匙，彈出設定視窗
-            }
+            if (!state.apiKey) toggleSettings();
             document.getElementById('apiKeyInput').value = state.apiKey;
         };
 
+        // --- UI Modal 控制 ---
         function toggleSettings() {
             document.getElementById('settingsModal').classList.toggle('hidden');
+        }
+
+        function toggleHistory() {
+            renderHistory();
+            document.getElementById('historyModal').classList.toggle('hidden');
         }
 
         function saveApiKey() {
@@ -161,6 +206,40 @@
             } else {
                 alert('請輸入有效的金鑰');
             }
+        }
+
+        // --- 歷史紀錄渲染與複製 ---
+        function renderHistory() {
+            const container = document.getElementById('historyListContainer');
+            if(state.promptHistory.length === 0) {
+                container.innerHTML = '<div class="text-center py-10 text-gray-500">尚無任何詠唱紀錄，請先完成一次生成。</div>';
+                return;
+            }
+            container.innerHTML = state.promptHistory.map((item, idx) => `
+                <div class="bg-gray-900 p-4 rounded-lg border border-gray-700 flex justify-between items-center gap-4 hover:border-gray-500 transition">
+                    <div class="flex-1 overflow-hidden">
+                        <p class="text-xs text-blue-400 mb-1">${item.time}</p>
+                        <p class="text-sm text-gray-300 truncate">${item.text.substring(0, 30).replace(/\n/g, ' ')}...</p>
+                    </div>
+                    <button onclick="copyFromHistory(${idx}, this)" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm font-bold transition whitespace-nowrap text-white">
+                        複製
+                    </button>
+                </div>
+            `).join('');
+        }
+
+        function copyFromHistory(idx, btnEl) {
+            navigator.clipboard.writeText(state.promptHistory[idx].text).then(() => {
+                const origText = btnEl.innerText;
+                btnEl.innerText = '✅ 已複製';
+                btnEl.classList.replace('bg-gray-700', 'bg-emerald-600');
+                btnEl.classList.replace('hover:bg-gray-600', 'hover:bg-emerald-500');
+                setTimeout(() => {
+                    btnEl.innerText = origText;
+                    btnEl.classList.replace('bg-emerald-600', 'bg-gray-700');
+                    btnEl.classList.replace('hover:bg-emerald-500', 'hover:bg-gray-600');
+                }, 2000);
+            });
         }
 
         function showLoading(text) {
@@ -202,19 +281,15 @@
             updateProgress(targetStep);
         }
 
+        // --- API 核心 ---
         async function callGemini(prompt, isJsonMode = false) {
             if (!state.apiKey) {
                 toggleSettings();
                 throw new Error("No API Key");
             }
-
-            // 【API 探勘宗師的最終修正】：使用探勘清單中確認可用的 gemini-flash-latest
             const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${state.apiKey}`;
-            
             let finalPrompt = prompt;
-            if (isJsonMode) {
-                finalPrompt += `\n\n**CRITICAL: You MUST output ONLY valid JSON. Do NOT wrap in markdown blockquotes like \`\`\`json. Just the raw JSON.**`;
-            }
+            if (isJsonMode) finalPrompt += `\n\n**CRITICAL: You MUST output ONLY valid JSON. Do NOT wrap in markdown blockquotes like \`\`\`json. Just the raw JSON.**`;
 
             try {
                 const response = await fetch(endpoint, {
@@ -226,18 +301,11 @@
                     })
                 });
 
-                if (!response.ok) {
-                    const err = await response.json();
-                    throw new Error(err.error.message || 'API 呼叫失敗');
-                }
-
+                if (!response.ok) throw new Error((await response.json()).error.message || 'API 呼叫失敗');
+                
                 const data = await response.json();
                 let textResult = data.candidates[0].content.parts[0].text;
-
-                if (isJsonMode) {
-                    textResult = textResult.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim();
-                    return JSON.parse(textResult);
-                }
+                if (isJsonMode) return JSON.parse(textResult.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim());
                 return textResult;
 
             } catch (error) {
@@ -246,6 +314,7 @@
             }
         }
 
+        // --- 流程控制 ---
         async function processStep1() {
             const idea = document.getElementById('ideaInput').value.trim();
             if (!idea) return alert("指揮官，請先輸入您的構想！");
@@ -253,17 +322,15 @@
             showLoading("零一正在分析您的構想，尋找最佳宗師...");
             
             const prompt = `使用者想開發的專案構想為：「${idea}」。請根據此專案，分析並回傳 3 位最適合協助開發的虛擬領域宗師。
-格式必須是 JSON 陣列，每個物件包含 "name" (宗師頭銜，如 UI/UX宗師) 和 "reason" (為何需要他，約20字)。
-範例: [{"name": "前端架構宗師", "reason": "負責規劃資料流與組件狀態"}]`;
+格式必須是 JSON 陣列，每個物件包含 "name" (宗師頭銜) 和 "reason" (為何需要他，約20字)。`;
 
             try {
                 const experts = await callGemini(prompt, true);
                 const listEl = document.getElementById('expertsList');
                 listEl.innerHTML = '';
-                let textRepresentation = "";
-                
+                state.expertsText = "";
                 experts.forEach(exp => {
-                    textRepresentation += `【${exp.name}】: ${exp.reason}\n`;
+                    state.expertsText += `【${exp.name}】: ${exp.reason}\n`;
                     listEl.innerHTML += `
                         <div class="flex items-start gap-4 bg-gray-900 p-4 rounded-xl border border-gray-700">
                             <div class="bg-blue-900/50 text-blue-400 p-2 rounded-lg">🧙‍♂️</div>
@@ -273,13 +340,9 @@
                             </div>
                         </div>`;
                 });
-                
-                state.expertsText = textRepresentation;
                 hideLoading();
                 goToStep(2); 
-            } catch (e) {
-                hideLoading();
-            }
+            } catch (e) { hideLoading(); }
         }
 
         async function processStep1_5() {
@@ -288,37 +351,26 @@
             if (customInput) finalExpertsContext += `\n使用者另外追加要求: ${customInput}`;
             
             showLoading("宗師聯合會診中，正在為您提煉關鍵問題...");
-
-            const prompt = `專案構想：「${state.idea}」。
-目前的智囊團陣容與要求：「${finalExpertsContext}」。
-請扮演這些宗師，針對此專案提出 3 到 4 個「最核心、最能收斂發散思維、釐清開發規格」的問題。不要問太泛用的問題，要針對性。
-格式必須是 JSON 陣列字串。
-範例: ["請問這個行事曆資料需要存進資料庫，還是純前端產生圖檔即可？", "介面偏好哪種風格？"]`;
+            const prompt = `專案構想：「${state.idea}」。目前的智囊團陣容：「${finalExpertsContext}」。
+請扮演這些宗師，針對此專案提出 3-4 個「最核心、能收斂發散思維」的問題。格式必須是 JSON 陣列字串。`;
 
             try {
-                const questions = await callGemini(prompt, true);
-                state.questions = questions;
+                state.questions = await callGemini(prompt, true);
                 const qContainer = document.getElementById('questionsContainer');
                 qContainer.innerHTML = '';
-                
-                questions.forEach((q, index) => {
+                state.questions.forEach((q, index) => {
                     qContainer.innerHTML += `
                         <div class="bg-gray-900 p-5 rounded-xl border border-gray-700">
-                            <label class="block font-medium text-gray-200 mb-3 text-sm">
-                                <span class="text-blue-400 font-bold mr-2">Q${index + 1}.</span>${q}
-                            </label>
+                            <label class="block font-medium text-gray-200 mb-3 text-sm"><span class="text-blue-400 font-bold mr-2">Q${index + 1}.</span>${q}</label>
                             <textarea id="answer-${index}" rows="2" class="w-full bg-gray-800 border border-gray-600 rounded-lg p-3 text-white focus:outline-none focus:border-blue-500 text-sm" placeholder="請在此輸入您的決策..."></textarea>
                         </div>`;
                 });
                 hideLoading();
                 goToStep(3); 
-            } catch (e) {
-                hideLoading();
-            }
+            } catch (e) { hideLoading(); }
         }
 
         async function processStep2() {
-            state.answers = [];
             let qaContext = "";
             for (let i = 0; i < state.questions.length; i++) {
                 const ans = document.getElementById(`answer-${i}`).value.trim() || '無特別意見';
@@ -328,26 +380,44 @@
 
             const prompt = `你現在是頂尖的 AI 提示詞工程師(Prompt Engineer)。使用者想要用 AI 寫程式。
 【原始構想】：${state.idea}
-【專家與使用者對答釐清】：
-${qaContext}
-
-請將以上資訊，轉譯並濃縮成一段「完美、結構化、可直接餵給一般 AI 模型來產出程式碼」的 System Prompt (系統提示詞)。
-這段提示詞必須包含：
-1. 指定 AI 的角色 (Role)
-2. 明確的任務目標 (Task)
-3. 根據 Q&A 整理出的技術架構與資料結構限制 (Constraints & Logic)
-4. 輸出要求 (Output Format)
-
-請直接給出這段要用來複製貼上的 Prompt 內容，不要包含多餘的問候語。`;
+【專家與使用者對答釐清】：\n${qaContext}
+請將以上資訊，轉譯並濃縮成一段「完美、結構化、可直接餵給一般 AI 模型來產出程式碼」的 System Prompt。
+包含：1. 指定角色 2. 任務目標 3. 架構與限制 4. 輸出要求。直接給出要用來複製貼上的 Prompt 內容，不要問候語。`;
 
             try {
                 const finalPrompt = await callGemini(prompt, false);
                 document.getElementById('finalPromptOutput').innerText = finalPrompt;
+                
+                // 升級：自動存入歷史紀錄 (上限 50 筆, FIFO)
+                const now = new Date();
+                const timeString = `${now.getFullYear()}/${(now.getMonth()+1).toString().padStart(2,'0')}/${now.getDate().toString().padStart(2,'0')} ${now.getHours().toString().padStart(2,'0')}:${now.getMinutes().toString().padStart(2,'0')}`;
+                state.promptHistory.unshift({ text: finalPrompt, time: timeString });
+                if (state.promptHistory.length > 50) state.promptHistory.pop();
+                localStorage.setItem('prompt_wizard_history', JSON.stringify(state.promptHistory));
+
                 hideLoading();
                 goToStep(4); 
-            } catch (e) {
-                hideLoading();
-            }
+            } catch (e) { hideLoading(); }
+        }
+
+        // --- 下載與複製功能 ---
+        function downloadPrompt() {
+            const text = document.getElementById('finalPromptOutput').innerText;
+            if (!text) return;
+            // 抓取前5個字作為檔名，若不足5字全取，並清除不合法檔名字元
+            let prefix = text.replace(/[\r\n\t]/g, '').trim().substring(0, 5).replace(/[\\/:*?"<>|]/g, '');
+            if(!prefix) prefix = "未命名";
+            const filename = `詠唱紀錄_${prefix}.txt`;
+            
+            const blob = new Blob([text], { type: 'text/plain;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
         }
 
         function copyPrompt() {
@@ -356,12 +426,12 @@ ${qaContext}
                 const btn = document.getElementById('copyBtn');
                 const originalHTML = btn.innerHTML;
                 btn.innerHTML = '✅ 已複製';
-                btn.classList.add('bg-emerald-600');
-                btn.classList.remove('bg-gray-700');
+                btn.classList.replace('bg-gray-700', 'bg-emerald-600');
+                btn.classList.replace('hover:bg-gray-600', 'hover:bg-emerald-500');
                 setTimeout(() => {
                     btn.innerHTML = originalHTML;
-                    btn.classList.remove('bg-emerald-600');
-                    btn.classList.add('bg-gray-700');
+                    btn.classList.replace('bg-emerald-600', 'bg-gray-700');
+                    btn.classList.replace('hover:bg-emerald-500', 'hover:bg-gray-600');
                 }, 2000);
             });
         }
