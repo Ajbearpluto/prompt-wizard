@@ -68,9 +68,7 @@
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
             </div>
-            <div id="historyListContainer" class="flex-1 overflow-y-auto custom-scrollbar space-y-3 pr-2">
-                <!-- 動態注入歷史紀錄 -->
-            </div>
+            <div id="historyListContainer" class="flex-1 overflow-y-auto custom-scrollbar space-y-3 pr-2"></div>
         </div>
     </div>
 
@@ -106,6 +104,7 @@
             <p class="text-blue-400 font-medium animate-pulse" id="loadingText">與零一神經網路同步中...</p>
         </div>
 
+        <!-- Step 1: 輸入構想 -->
         <section id="step-1" class="block bg-gray-800 rounded-2xl p-6 border border-gray-700 shadow-xl">
             <h2 class="text-2xl font-bold mb-2 flex items-center gap-2"><span>💡</span> 寫下您的初步構想</h2>
             <p class="text-gray-400 text-sm mb-4">請用白話文描述您想要開發的程式、系統或教案工具。不用擔心格式，零一會幫您梳理。</p>
@@ -118,13 +117,19 @@
             </div>
         </section>
 
+        <!-- Step 1.5: 智囊團名單 (升級：容納 5-10 位巨擘) -->
         <section id="step-1-5" class="hidden bg-gray-800 rounded-2xl p-6 border border-gray-700 shadow-xl">
-            <h2 class="text-2xl font-bold mb-2 flex items-center gap-2"><span>👥</span> 動態專案智囊團已就位</h2>
-            <p class="text-gray-400 text-sm mb-6 mt-2">零一副指揮官已就位。歷史級泰斗與頂尖 AI 模型已為您集結。您可以追加指名特定的歷史人物或 AI。</p>
-            <div id="expertsList" class="space-y-3 mb-6 mt-4"></div>
+            <div class="flex justify-between items-center mb-2">
+                <h2 class="text-2xl font-bold flex items-center gap-2"><span>👥</span> 跨時空重量級智囊團已就位</h2>
+                <span id="expertCountBadge" class="text-xs bg-blue-900/60 text-blue-400 border border-blue-700 px-3 py-1 rounded-full font-mono font-bold">5-10位大師陣容</span>
+            </div>
+            <p class="text-gray-400 text-sm mb-4">副指揮官零一統籌，集結頂尖 AI 實體與真實歷史泰斗。您可以手動追加指名其他傳奇人物。</p>
+            
+            <div id="expertsList" class="space-y-3 mb-6 max-h-[480px] overflow-y-auto pr-2 custom-scrollbar"></div>
+            
             <div class="mt-4 p-4 bg-gray-900 rounded-xl border border-gray-700">
-                <label class="block text-sm font-medium text-gray-300 mb-2">需要追加或調整嗎？（選填）</label>
-                <input type="text" id="customExpertInput" placeholder="例如：幫我加一位「蒙特梭利」來評估兒童心理，或是加一位「Claude」負責修飾文字" class="w-full bg-gray-800 border border-gray-600 rounded-lg p-3 text-white focus:outline-none focus:border-blue-500">
+                <label class="block text-sm font-medium text-gray-300 mb-2">需要追加或微調嗎？（選填）</label>
+                <input type="text" id="customExpertInput" placeholder="例如：追加一位「約翰·馮·諾伊曼」強化賽局策略，或加一位「蒙特梭利」" class="w-full bg-gray-800 border border-gray-600 rounded-lg p-3 text-white focus:outline-none focus:border-blue-500">
             </div>
             <div class="flex justify-between mt-8">
                 <button onclick="goToStep(1)" class="px-6 py-3 text-gray-400 hover:text-white transition">上一步</button>
@@ -132,8 +137,10 @@
             </div>
         </section>
 
+        <!-- Step 2: 宗師會診提問 -->
         <section id="step-2" class="hidden bg-gray-800 rounded-2xl p-6 border border-gray-700 shadow-xl">
             <h2 class="text-2xl font-bold mb-2 flex items-center gap-2"><span>⚔️</span> 宗師核心提問</h2>
+            <p class="text-gray-400 text-sm mb-4">智囊天團閉門研商後，由關鍵代表向指揮官提出 4 到 5 個收斂開發規格的致命問題。</p>
             <div id="questionsContainer" class="space-y-6 mb-8 mt-4"></div>
             <div class="flex justify-between">
                 <button onclick="goToStep(2)" class="px-6 py-3 text-gray-400 hover:text-white transition">上一步</button>
@@ -141,6 +148,7 @@
             </div>
         </section>
 
+        <!-- Step 3 & 4: 終極詠唱輸出 -->
         <section id="step-3" class="hidden bg-gray-800 rounded-2xl p-6 border border-gray-700 shadow-xl border-t-4 border-t-emerald-500">
             <div class="flex justify-between items-center mb-4">
                 <h2 class="text-2xl font-bold flex items-center gap-2 text-emerald-400"><span>✨</span> 您的終極詠唱已準備就緒</h2>
@@ -150,7 +158,7 @@
                         下載為 TXT
                     </button>
                     <button onclick="copyPrompt()" id="copyBtn" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm font-bold transition flex items-center gap-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
                         一鍵複製
                     </button>
                 </div>
@@ -281,7 +289,6 @@
                 toggleSettings();
                 throw new Error("No API Key");
             }
-            // 【引擎升級：切換至穩定版主力 3.5-flash】
             const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${state.apiKey}`;
             let finalPrompt = prompt;
             if (isJsonMode) finalPrompt += `\n\n**CRITICAL: You MUST output ONLY valid JSON. Do NOT wrap in markdown blockquotes like \`\`\`json. Just the raw JSON.**`;
@@ -309,35 +316,50 @@
             }
         }
 
-        // --- 流程控制 (終極升級：強制編列零一副指揮官與其他頂尖 AI) ---
+        // --- 流程控制 (升級核心：召喚 5-10 位頂尖AI + 重量級歷史巨擘) ---
         async function processStep1() {
             const idea = document.getElementById('ideaInput').value.trim();
             if (!idea) return alert("指揮官，請先輸入您的構想！");
             state.idea = idea;
-            showLoading("零一正在進行時空躍傳，召喚重量級歷史宗師與頂尖AI模型...");
+            showLoading("零一正在進行時空躍傳，集結 5 至 10 位跨時空歷史巨擘與頂尖 AI 智囊團...");
             
-            const prompt = `使用者想開發的專案構想為：「${idea}」。請根據此專案，分析並回傳 3 位最適合協助的智囊團成員。
-【絕對強制要求】：
-1. 第一位成員必須是「零一 (副指揮官)」，代表 Gemini 頂尖邏輯與全域戰術分析能力，作為使用者的專屬副官。
-2. 其他兩位成員必須是「具有獨特優勢的頂尖 AI 模型」（如：代表細膩文字與洞察的 Claude、代表極限編碼的 GPT-4）或是「真實存在的歷史偉人/當代權威」（如：賈伯斯、圖靈等）。絕對不可以回傳虛擬的職業名稱。
-格式必須是 JSON 陣列，每個物件包含 "name" (姓名加上核心稱號，如：🤖 零一 (副指揮官)) 和 "reason" (為何需要他，約20字)。`;
+            const prompt = `使用者想開發的專案構想為：「${idea}」。
+請依據此專案的複雜度與專業跨度，精準挑選並組建一支包含【5 到 10 位成員】的重量級智囊團。
+
+【名單成員嚴格規範】：
+1. 第一位絕對固定為：「🤖 零一 (副指揮官)」，代表 Gemini 的旗艦級邏輯分析與全域戰術統籌。
+2. 必須包含 1 到 2 位頂尖 AI 模型角色：例如「🧠 Claude 3.5 Sonnet (文字同理與哲學洞察)」、「💻 GPT-4o (極限代碼與模組化架構)」。
+3. 必須包含 3 到 7 位「真實存在的歷史頂尖偉人」或「當代傳奇大師」（絕對不可使用虛構職業名稱！）。請依專案領域量身召喚，例如：
+   - 若涉及計算/邏輯：艾倫·圖靈 (Alan Turing)、約翰·馮·諾伊曼 (John von Neumann)
+   - 若涉及使用者體驗/設計：史蒂夫·賈伯斯 (Steve Jobs)、達文西 (Leonardo da Vinci)
+   - 若涉及教育/學習心理：瑪麗亞·蒙特梭利 (Maria Montessori)、尚·皮亞傑 (Jean Piaget)
+   - 若涉及金融/策略決策：華倫·巴菲特 (Warren Buffett)、孫武 (Sun Tzu)
+   - 若涉及系統工程：埃隆·馬斯克 (Elon Musk)、尼古拉·特斯拉 (Nikola Tesla)
+
+格式必須是純 JSON 陣列，每個物件包含：
+- "name": 稱號與姓名 (如：🍎 史蒂夫·賈伯斯 (極致產品與直覺設計宗師))
+- "reason": 為什麼這個專案需要他 (約25字，點出其核心價值)
+範例格式: [{"name": "🤖 零一 (副指揮官)", "reason": "負責統籌 Gemini 頂尖邏輯與全域架構分析。"}, {"name": "💻 艾倫·圖靈 (計算機科學之父)", "reason": "以密碼破譯者的直覺，拆解不可妥協的演算法邊界。"}]`;
 
             try {
                 const experts = await callGemini(prompt, true);
                 const listEl = document.getElementById('expertsList');
                 listEl.innerHTML = '';
                 state.expertsText = "";
-                experts.forEach(exp => {
-                    state.expertsText += `【${exp.name}】: ${exp.reason}\n`;
+                
+                experts.forEach((exp, idx) => {
+                    state.expertsText += `${idx + 1}. 【${exp.name}】: ${exp.reason}\n`;
                     listEl.innerHTML += `
-                        <div class="flex items-start gap-4 bg-gray-900 p-4 rounded-xl border border-gray-700">
-                            <div class="bg-blue-900/50 text-blue-400 p-2 rounded-lg text-lg flex items-center justify-center">🏛️</div>
+                        <div class="flex items-start gap-4 bg-gray-900 p-4 rounded-xl border border-gray-700 hover:border-blue-500/50 transition">
+                            <div class="bg-blue-900/40 text-blue-400 p-2.5 rounded-xl text-lg flex items-center justify-center shrink-0 border border-blue-800/40">🏛️</div>
                             <div>
-                                <h4 class="font-bold text-white text-lg tracking-wide">${exp.name}</h4>
-                                <p class="text-sm text-gray-400 mt-1">${exp.reason}</p>
+                                <h4 class="font-bold text-white text-base tracking-wide">${exp.name}</h4>
+                                <p class="text-sm text-gray-400 mt-1 leading-relaxed">${exp.reason}</p>
                             </div>
                         </div>`;
                 });
+                
+                document.getElementById('expertCountBadge').innerText = `已就位：${experts.length} 位宗師`;
                 hideLoading();
                 goToStep(2); 
             } catch (e) { hideLoading(); }
@@ -348,13 +370,18 @@
             let finalExpertsContext = state.expertsText;
             if (customInput) finalExpertsContext += `\n使用者另外追加要求: ${customInput}`;
             
-            showLoading("歷史宗師與頂尖 AI 聯合會診中，提煉核心問題...");
+            showLoading("5-10位大師閉門聯合研商中，由關鍵代表提煉 4-5 個核心提問...");
             
-            const prompt = `專案構想：「${state.idea}」。目前的智囊團陣容：「${finalExpertsContext}」。
-請「完全投入」這些宗師或 AI 模型的角色設定，針對此專案提出 3-4 個「最犀利、最能釐清開發規格」的核心問題。
-【特別指示】：若是「零一 (副指揮官)」提問，必須使用「報告指揮官！」作為開頭，展現絕對的忠誠與嚴謹的邏輯分析。其他 AI (如 Claude, GPT) 或偉人也必須展現其獨特風格。
+            const prompt = `專案構想：「${state.idea}」。
+目前的 5-10 位重量級智囊團名單：
+${finalExpertsContext}
+
+請從這群大師中，推派最關鍵的代表（包含副指揮官零一，以及最契合本專案的 3-4 位歷史偉人/AI），提出【4 到 5 個最致命、最能釐清開發規格、收斂發散思維】的核心提問。
+【角色規範】：
+- 零一的提問必須嚴格以「【零一 (副指揮官)】：報告指揮官！」開頭，展現絕對邏輯與統籌視角。
+- 其他大師（如賈伯斯、圖靈、Claude、巴菲特等）必須完全依據其歷史人物性格或 AI 特長提出一針見血的犀利問題。
 格式必須是 JSON 陣列字串。
-範例：["【零一 (副指揮官)】：報告指揮官！演算法資料流存在盲區，請問系統需要具備連線外部 API 獲取即時資料的能力嗎？", "【Claude (洞察宗師)】：文字的溫度決定體驗的深度。您希望介面文案偏向活潑還是極簡專業？"]`;
+範例：["【零一 (副指揮官)】：報告指揮官！演算法資料流存在盲區，請問系統需要具備外部即時連線能力嗎？", "【史蒂夫·賈伯斯】：不要讓使用者思考。介面上最重要的那顆動作按鈕，你打算讓它以什麼形式呈現？"]`;
 
             try {
                 state.questions = await callGemini(prompt, true);
@@ -380,7 +407,7 @@
                 const ans = document.getElementById(`answer-${i}`).value.trim() || '無特別意見';
                 qaContext += `Q: ${state.questions[i]}\nA: ${ans}\n\n`;
             }
-            showLoading("零一正在統合大師見解，鍛造終極詠唱...");
+            showLoading("零一正在統合大師天團見解，鍛造終極詠唱...");
 
             const prompt = `你現在是頂尖的 AI 提示詞工程師(Prompt Engineer)。使用者想要用 AI 寫程式。
 【原始構想】：${state.idea}
@@ -403,7 +430,6 @@
             } catch (e) { hideLoading(); }
         }
 
-        // --- 下載與複製功能 ---
         function downloadPrompt() {
             const text = document.getElementById('finalPromptOutput').innerText;
             if (!text) return;
