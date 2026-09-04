@@ -150,7 +150,7 @@
                         下載為 TXT
                     </button>
                     <button onclick="copyPrompt()" id="copyBtn" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm font-bold transition flex items-center gap-2">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
                         一鍵複製
                     </button>
                 </div>
@@ -281,7 +281,8 @@
                 toggleSettings();
                 throw new Error("No API Key");
             }
-            const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${state.apiKey}`;
+            // 【引擎升級：切換至穩定版主力 3.5-flash】
+            const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${state.apiKey}`;
             let finalPrompt = prompt;
             if (isJsonMode) finalPrompt += `\n\n**CRITICAL: You MUST output ONLY valid JSON. Do NOT wrap in markdown blockquotes like \`\`\`json. Just the raw JSON.**`;
 
