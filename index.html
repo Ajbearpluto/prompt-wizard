@@ -18,13 +18,11 @@
         }
     </script>
     <style>
-        /* 隱藏原生捲軸，打造極簡體驗 */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.1); border-radius: 10px; }
         ::-webkit-scrollbar-thumb:hover { background: rgba(255, 255, 255, 0.2); }
         
-        /* 毛玻璃與發光特效 */
         .glass-panel {
             background: rgba(255, 255, 255, 0.03);
             backdrop-filter: blur(16px);
@@ -35,9 +33,31 @@
             box-shadow: 0 0 20px rgba(59, 130, 246, 0.15);
             border-color: rgba(59, 130, 246, 0.4);
         }
+        .loader {
+            border-top-color: #3b82f6;
+            -webkit-animation: spinner 1s linear infinite;
+            animation: spinner 1s linear infinite;
+        }
+        @keyframes spinner {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body class="bg-zinc-950 text-zinc-100 h-screen w-full flex overflow-hidden selection:bg-blue-500/30">
+
+    <!-- API 設定 Modal -->
+    <div id="settingsModal" class="hidden fixed inset-0 bg-black/60 backdrop-blur-md z-[100] flex items-center justify-center">
+        <div class="bg-zinc-900 p-6 rounded-2xl border border-zinc-700 w-full max-w-md shadow-2xl relative">
+            <h2 class="text-lg font-bold text-white mb-4">⚙️ 設定 API 能源金鑰</h2>
+            <p class="text-sm text-zinc-400 mb-4">系統需綁定 Gemini API 以驅動宗師會診。金鑰僅加密儲存於本機瀏覽器。</p>
+            <input type="password" id="apiKeyInput" placeholder="輸入 AIzaSy..." class="w-full bg-zinc-950 border border-zinc-700 rounded-xl p-3 text-white focus:outline-none focus:border-blue-500 mb-6">
+            <div class="flex justify-end gap-3">
+                <button onclick="toggleSettings()" class="px-4 py-2 rounded-xl text-zinc-400 hover:text-white transition">取消</button>
+                <button onclick="saveApiKey()" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded-xl text-white font-bold transition shadow-lg shadow-blue-500/20">鎖定並儲存</button>
+            </div>
+        </div>
+    </div>
 
     <!-- 左側：記憶宮殿側邊欄 -->
     <aside class="w-80 glass-panel flex flex-col border-r border-zinc-800/50 z-10 relative">
@@ -46,80 +66,85 @@
                 <span class="w-2 h-2 rounded-full bg-blue-500 animate-pulse shadow-[0_0_8px_rgba(59,130,246,0.8)]"></span>
                 Memory Palace
             </h1>
-            <span class="text-xs text-zinc-500 flex items-center gap-1">
-                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z"></path></svg>
-                已同步
-            </span>
+            <button onclick="toggleSettings()" class="text-zinc-500 hover:text-white transition" title="API 設定">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+            </button>
         </div>
         
-        <!-- 分類過濾器 -->
-        <div class="px-6 py-4 flex gap-2 overflow-x-auto no-scrollbar">
-            <button class="px-3 py-1 text-xs rounded-full bg-white/10 text-white hover:bg-white/20 transition">全部</button>
-            <button class="px-3 py-1 text-xs rounded-full border border-zinc-700 text-zinc-400 hover:text-white hover:border-zinc-500 transition">金融</button>
-            <button class="px-3 py-1 text-xs rounded-full border border-zinc-700 text-zinc-400 hover:text-white hover:border-zinc-500 transition">教育</button>
-            <button class="px-3 py-1 text-xs rounded-full border border-zinc-700 text-zinc-400 hover:text-white hover:border-zinc-500 transition">程式</button>
-        </div>
-
-        <!-- 歷史卡片流 -->
         <div id="history-container" class="flex-1 overflow-y-auto p-4 space-y-3">
-            <!-- 卡片由 JS 動態生成 -->
+            <!-- 歷史紀錄動態載入 -->
         </div>
     </aside>
 
-    <!-- 右側：主工作區 (輸入與預覽) -->
-    <main class="flex-1 flex flex-col md:flex-row h-full">
+    <!-- 主工作區 -->
+    <main class="flex-1 flex flex-col md:flex-row h-full relative">
         
-        <!-- 創作輸入區 -->
-        <section class="flex-1 flex flex-col p-8 border-r border-zinc-800/50">
-            <div class="mb-6 flex justify-between items-end">
-                <div>
-                    <h2 class="text-2xl font-bold text-white mb-1">提示詞鑄造區</h2>
-                    <p class="text-sm text-zinc-400">寫下您的構想，右側將即時渲染最終詠唱。</p>
+        <!-- 全域載入遮罩 -->
+        <div id="loadingOverlay" class="hidden absolute inset-0 z-40 bg-zinc-950/80 backdrop-blur-sm flex-col items-center justify-center">
+            <div class="loader ease-linear rounded-full border-4 border-t-4 border-zinc-700 h-12 w-12 mb-4"></div>
+            <p class="text-blue-400 font-medium animate-pulse" id="loadingText">與零一神經網路同步中...</p>
+        </div>
+
+        <!-- 創作與會診區 (中欄) -->
+        <section class="flex-1 flex flex-col p-8 border-r border-zinc-800/50 relative">
+            
+            <!-- 狀態 1：輸入構想 -->
+            <div id="state-input" class="flex-1 flex flex-col h-full">
+                <div class="mb-6">
+                    <h2 class="text-2xl font-bold text-white mb-1">💡 提示詞鑄造區</h2>
+                    <p class="text-sm text-zinc-400">寫下您的原始需求，我們將為您轉譯為機器最易懂的語言。</p>
                 </div>
-                <button onclick="clearEditor()" class="text-sm text-zinc-500 hover:text-white transition flex items-center gap-1">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                    清空
-                </button>
+                <div class="flex-1 relative glow-focus transition-all duration-300 rounded-2xl glass-panel flex flex-col">
+                    <textarea 
+                        id="ideaInput"
+                        class="w-full flex-1 bg-transparent p-6 text-zinc-200 resize-none focus:outline-none text-base leading-relaxed"
+                        placeholder="例如：我想結合太極系統的 20MA 跟 60MA 來寫一支選股條件..."
+                    ></textarea>
+                </div>
+                <div class="mt-6 flex justify-end">
+                    <button onclick="startConsultation()" class="px-8 py-3.5 bg-blue-600 hover:bg-blue-500 rounded-xl text-white font-bold transition shadow-lg shadow-blue-900/30 flex items-center gap-2">
+                        召喚智囊團會診
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                    </button>
+                </div>
             </div>
 
-            <div class="flex-1 relative glow-focus transition-all duration-300 rounded-2xl glass-panel flex flex-col">
-                <textarea 
-                    id="prompt-editor"
-                    class="w-full flex-1 bg-transparent p-6 text-zinc-200 resize-none focus:outline-none text-base leading-relaxed"
-                    placeholder="請在此輸入您的系統提示詞或原始構想..."
-                    oninput="handleInput()"
-                ></textarea>
-                
-                <!-- 底部工具列 -->
-                <div class="p-4 border-t border-zinc-800/50 flex justify-between items-center bg-black/20 rounded-b-2xl">
-                    <div class="flex gap-2">
-                        <button class="p-2 text-zinc-400 hover:text-blue-400 transition rounded-lg hover:bg-white/5" title="插入變數 {{var}}">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
-                        </button>
+            <!-- 狀態 2：宗師會診提問 -->
+            <div id="state-consult" class="hidden flex-1 flex flex-col h-full">
+                <div class="mb-6 flex justify-between items-center">
+                    <div>
+                        <h2 class="text-2xl font-bold text-white mb-1">⚔️ 宗師會診中</h2>
+                        <p class="text-sm text-zinc-400">請回答大師們的核心提問，以收斂最終規格。</p>
                     </div>
-                    <span class="text-xs text-zinc-500 font-mono" id="char-count">0 words</span>
+                    <button onclick="resetToInput()" class="text-sm text-zinc-500 hover:text-white transition">取消重來</button>
+                </div>
+                <div class="flex-1 overflow-y-auto pr-2 custom-scrollbar">
+                    <div id="questionsContainer" class="space-y-6"></div>
+                </div>
+                <div class="mt-6 flex justify-end">
+                    <button onclick="forgeUltimatePrompt()" class="px-8 py-3.5 bg-emerald-600 hover:bg-emerald-500 rounded-xl text-white font-bold transition shadow-lg shadow-emerald-900/30 flex items-center gap-2">
+                        ✨ 鍛造終極詠唱
+                    </button>
                 </div>
             </div>
         </section>
 
-        <!-- 即時預覽區 -->
+        <!-- 終極詠唱輸出區 (右欄) -->
         <section class="flex-1 flex flex-col p-8 bg-black/20">
             <div class="mb-6 flex justify-between items-end">
-                <h2 class="text-2xl font-bold text-white mb-1">Live Preview</h2>
-                
-                <button id="copy-btn" onclick="copyToClipboard()" class="group relative px-5 py-2.5 font-medium text-white bg-blue-600 rounded-xl transition hover:bg-blue-500 flex items-center gap-2 overflow-hidden shadow-lg shadow-blue-900/20">
+                <h2 class="text-2xl font-bold text-white mb-1">Final Prompt</h2>
+                <button id="copy-btn" onclick="copyToClipboard()" class="group relative px-5 py-2.5 font-medium text-white bg-zinc-800 rounded-xl transition hover:bg-zinc-700 flex items-center gap-2 overflow-hidden border border-zinc-700">
                     <span id="copy-text" class="relative z-10 flex items-center gap-2">
                         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
                         一鍵複製
                     </span>
-                    <div class="absolute inset-0 bg-emerald-500 transform scale-x-0 group-active:scale-x-100 transition-transform origin-left duration-200"></div>
                 </button>
             </div>
 
             <div class="flex-1 glass-panel rounded-2xl p-6 overflow-y-auto relative">
                 <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center text-zinc-600 pointer-events-none">
-                    <svg class="w-12 h-12 mb-3 opacity-20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
-                    <p class="text-sm">等待輸入，即時渲染魔法</p>
+                    <svg class="w-12 h-12 mb-3 opacity-20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+                    <p class="text-sm">等待智囊團鍛造，轉譯為 AI 專屬語言</p>
                 </div>
                 <pre id="preview-output" class="font-mono text-sm text-zinc-300 whitespace-pre-wrap leading-relaxed hidden"></pre>
             </div>
@@ -133,123 +158,203 @@
     </div>
 
     <script>
-        // 預設記憶宮殿資料
-        const historyData = [
-            {
-                id: 1,
-                title: "太極系統 20MA/60MA 策略",
-                tags: ["金融", "程式"],
-                date: "2 mins ago",
-                content: "# Role\n你是一位精通台指期與技術分析的量化交易專家。\n\n# Task\n以太極系統（聖盃系統）為基礎，結合 15 分鐘與 60 分鐘 K 線，利用 20MA 與 60MA 的黃金交叉/死亡交叉，撰寫一支 MultiCharts 語法的選股條件腳本。\n\n# Constraints\n- 需加入 VIX 波動率過濾條件。\n- 支援 OCO 條件單出場機制。"
-            },
-            {
-                id: 2,
-                title: "小勇士跨校閱讀與 SEL 教案",
-                tags: ["教育", "寫作"],
-                date: "2 hours ago",
-                content: "# Role\n你是一位具備十年經驗的創新國小教師，精通數位學習與跨校共備。\n\n# Task\n請為班上的「小勇士」們設計一份結合社會情緒學習 (SEL) 框架的跨校閱讀理解教案。需使用多文本閱讀策略。\n\n# Output\n- 提供 WQSA 學習單範本。\n- 包含一份使用生成式 AI 輔助評量的 Rubrics (評量尺規)。"
+        let state = {
+            apiKey: localStorage.getItem('gemini_api_key') || '',
+            idea: '',
+            questions: [],
+            promptHistory: JSON.parse(localStorage.getItem('prompt_wizard_history') || '[]')
+        };
+
+        window.onload = () => {
+            if (!state.apiKey) toggleSettings();
+            document.getElementById('apiKeyInput').value = state.apiKey;
+            renderHistory();
+        };
+
+        function toggleSettings() { document.getElementById('settingsModal').classList.toggle('hidden'); }
+        
+        function saveApiKey() {
+            const key = document.getElementById('apiKeyInput').value.trim();
+            if (key) {
+                localStorage.setItem('gemini_api_key', key);
+                state.apiKey = key;
+                toggleSettings();
+                showToast('API 金鑰已加密鎖定');
+            } else {
+                alert('請輸入有效的金鑰');
             }
-        ];
+        }
 
-        const editor = document.getElementById('prompt-editor');
-        const preview = document.getElementById('preview-output');
-        const emptyState = document.getElementById('empty-state');
-        const charCount = document.getElementById('char-count');
+        function showLoading(text) {
+            document.getElementById('loadingText').innerText = text;
+            document.getElementById('loadingOverlay').classList.remove('hidden');
+            document.getElementById('loadingOverlay').classList.add('flex');
+        }
 
-        // 渲染記憶宮殿
+        function hideLoading() {
+            document.getElementById('loadingOverlay').classList.add('hidden');
+            document.getElementById('loadingOverlay').classList.remove('flex');
+        }
+
+        // --- API 引擎核心 ---
+        async function callGemini(prompt, isJsonMode = false) {
+            if (!state.apiKey) {
+                toggleSettings();
+                throw new Error("Missing API Key");
+            }
+            const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent?key=${state.apiKey}`;
+            let finalPrompt = prompt;
+            if (isJsonMode) finalPrompt += `\n\n**CRITICAL: You MUST output ONLY valid JSON format. Do NOT wrap in markdown blockquotes like \`\`\`json. Just the raw JSON.**`;
+
+            try {
+                const response = await fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{ parts: [{ text: finalPrompt }] }],
+                        generationConfig: { temperature: 0.2 }
+                    })
+                });
+                if (!response.ok) throw new Error((await response.json()).error.message || 'API Error');
+                const data = await response.json();
+                let textResult = data.candidates[0].content.parts[0].text;
+                if (isJsonMode) return JSON.parse(textResult.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim());
+                return textResult;
+            } catch (error) {
+                alert("通訊干擾：" + error.message);
+                throw error;
+            }
+        }
+
+        // --- 核心轉譯邏輯 ---
+        async function startConsultation() {
+            const idea = document.getElementById('ideaInput').value.trim();
+            if (!idea) return alert("指揮官，請先輸入您的構想！");
+            state.idea = idea;
+            
+            showLoading("零一與宗師聯合會診中，拆解您的構想邊界...");
+            
+            const prompt = `使用者想開發的專案構想：「${idea}」。
+請模擬包含「🤖 零一 (副指揮官)」、「🧠 Claude 3.5 Sonnet」、「🍎 史蒂夫·賈伯斯」等頂尖智囊團，針對此專案提出【3 到 4 個最致命、最能釐清開發規格】的核心提問。
+【角色規範】：零一必須以「【零一 (副指揮官)】：報告指揮官！」開頭，展現邏輯統籌視角。其他大師依其特長發問。
+格式必須是 JSON 陣列字串。
+範例：["【零一 (副指揮官)】：報告指揮官！資料流存在盲區，請問系統需要具備外部 API 獲取資料能力嗎？"]`;
+
+            try {
+                state.questions = await callGemini(prompt, true);
+                
+                // 切換 UI 面板
+                document.getElementById('state-input').classList.add('hidden');
+                document.getElementById('state-consult').classList.remove('hidden');
+                
+                const qContainer = document.getElementById('questionsContainer');
+                qContainer.innerHTML = '';
+                state.questions.forEach((q, index) => {
+                    qContainer.innerHTML += `
+                        <div class="bg-white/5 p-5 rounded-2xl border border-white/10 border-l-4 border-l-blue-500 shadow-sm">
+                            <label class="block font-medium text-zinc-200 mb-3 text-sm leading-relaxed">
+                                <span class="text-blue-400 font-bold mr-2">Q${index + 1}.</span>${q}
+                            </label>
+                            <textarea id="answer-${index}" rows="2" class="w-full bg-zinc-900 border border-zinc-700 rounded-xl p-3 text-white focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-500 text-sm transition" placeholder="請指揮官輸入決策 (或留空交由系統預設)..."></textarea>
+                        </div>`;
+                });
+                hideLoading();
+            } catch (e) { hideLoading(); }
+        }
+
+        async function forgeUltimatePrompt() {
+            let qaContext = "";
+            for (let i = 0; i < state.questions.length; i++) {
+                const ans = document.getElementById(`answer-${i}`).value.trim() || '無特別限制，請大師提供最佳實踐。';
+                qaContext += `Q: ${state.questions[i]}\nA: ${ans}\n\n`;
+            }
+            showLoading("零一正在統合大師見解，轉譯為 AI 終極詠唱...");
+
+            const prompt = `你現在是頂尖的 AI 提示詞工程師(Prompt Engineer)。
+【原始構想】：${state.idea}
+【專家與使用者對答釐清】：\n${qaContext}
+請將以上資訊，轉譯並濃縮成一段「完美、結構化、可直接餵給一般 AI 模型來產出結果」的 System Prompt。
+包含：1. 指定角色 (Role) 2. 任務目標 (Task) 3. 架構與限制 (Constraints) 4. 輸出要求 (Output Format)。
+直接給出要用來複製貼上的 Prompt 內容，不要任何問候語或 Markdown 代碼塊包裝。`;
+
+            try {
+                const finalPrompt = await callGemini(prompt, false);
+                
+                // 渲染至右側面板
+                document.getElementById('empty-state').classList.add('hidden');
+                const preview = document.getElementById('preview-output');
+                preview.classList.remove('hidden');
+                
+                // 簡單 Markdown 上色
+                preview.innerHTML = finalPrompt
+                    .replace(/^(# .*$)/gm, '<span class="text-blue-400 font-bold">$1</span>')
+                    .replace(/^(- .*$)/gm, '<span class="text-zinc-400">$1</span>');
+                
+                // 儲存至歷史紀錄
+                const now = new Date();
+                const timeString = `${now.getMonth()+1}/${now.getDate()} ${now.getHours()}:${now.getMinutes().toString().padStart(2,'0')}`;
+                state.promptHistory.unshift({ 
+                    idea: state.idea.substring(0, 20) + "...", 
+                    text: finalPrompt, 
+                    time: timeString 
+                });
+                if (state.promptHistory.length > 50) state.promptHistory.pop();
+                localStorage.setItem('prompt_wizard_history', JSON.stringify(state.promptHistory));
+                
+                renderHistory();
+                hideLoading();
+                resetToInput(true); // 回到輸入狀態，保留右側結果
+            } catch (e) { hideLoading(); }
+        }
+
+        function resetToInput(keepIdea = false) {
+            document.getElementById('state-consult').classList.add('hidden');
+            document.getElementById('state-input').classList.remove('hidden');
+            if(!keepIdea) document.getElementById('ideaInput').value = '';
+        }
+
         function renderHistory() {
             const container = document.getElementById('history-container');
-            container.innerHTML = historyData.map(item => `
-                <div class="group bg-white/5 hover:bg-white/10 border border-white/5 hover:border-white/10 rounded-xl p-4 cursor-pointer transition-all duration-300 relative overflow-hidden" onclick="applyHistory(${item.id})">
-                    <div class="flex justify-between items-start mb-2">
-                        <h3 class="text-sm font-semibold text-zinc-200 group-hover:text-blue-400 transition">${item.title}</h3>
-                    </div>
-                    <p class="text-xs text-zinc-500 line-clamp-2 mb-3">${item.content}</p>
-                    <div class="flex justify-between items-center">
-                        <div class="flex gap-1.5">
-                            ${item.tags.map(tag => `<span class="px-2 py-0.5 text-[10px] bg-zinc-800/80 text-zinc-400 rounded-md border border-zinc-700/50">${tag}</span>`).join('')}
-                        </div>
-                        <span class="text-[10px] text-zinc-600">${item.date}</span>
-                    </div>
-                    <!-- 一鍵套用微動效 -->
-                    <div class="absolute inset-0 bg-blue-500/10 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center backdrop-blur-[2px]">
-                        <span class="text-sm font-bold text-white drop-shadow-md flex items-center gap-1">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"></path></svg>
-                            點擊套用
-                        </span>
-                    </div>
+            if(state.promptHistory.length === 0) {
+                container.innerHTML = '<div class="text-center py-10 text-zinc-600 text-sm">尚無記憶檔案</div>';
+                return;
+            }
+            container.innerHTML = state.promptHistory.map((item, idx) => `
+                <div class="group bg-white/5 hover:bg-white/10 border border-white/5 rounded-xl p-4 cursor-pointer transition relative" onclick="viewHistory(${idx})">
+                    <h3 class="text-sm font-semibold text-zinc-300 group-hover:text-blue-400 mb-1">${item.idea}</h3>
+                    <p class="text-xs text-zinc-500 line-clamp-2">${item.text}</p>
+                    <div class="mt-2 text-right"><span class="text-[10px] text-zinc-600">${item.time}</span></div>
                 </div>
             `).join('');
         }
 
-        // 即時預覽處理
-        function handleInput() {
-            const text = editor.value;
-            charCount.textContent = `${text.length} words`;
-            
-            if (text.trim() === '') {
-                preview.classList.add('hidden');
-                emptyState.classList.remove('hidden');
-            } else {
-                emptyState.classList.add('hidden');
-                preview.classList.remove('hidden');
-                // 基礎 Markdown 高亮處理 (簡單實作)
-                let formatted = text
+        function viewHistory(idx) {
+            const data = state.promptHistory[idx];
+            document.getElementById('empty-state').classList.add('hidden');
+            const preview = document.getElementById('preview-output');
+            preview.classList.remove('hidden');
+            preview.innerHTML = data.text
                     .replace(/^(# .*$)/gm, '<span class="text-blue-400 font-bold">$1</span>')
-                    .replace(/^(- .*$)/gm, '<span class="text-zinc-400">$1</span>')
-                    .replace(/(\{\{.*?\}\})/g, '<span class="bg-amber-500/20 text-amber-300 px-1 rounded">$1</span>');
-                preview.innerHTML = formatted;
-            }
+                    .replace(/^(- .*$)/gm, '<span class="text-zinc-400">$1</span>');
         }
 
-        // 套用歷史紀錄
-        function applyHistory(id) {
-            const data = historyData.find(item => item.id === id);
-            if (data) {
-                editor.value = data.content;
-                handleInput();
-                
-                // 視覺反饋
-                editor.classList.add('bg-blue-500/10');
-                setTimeout(() => editor.classList.remove('bg-blue-500/10'), 300);
-            }
-        }
-
-        // 清空編輯區
-        function clearEditor() {
-            editor.value = '';
-            handleInput();
-        }
-
-        // 一鍵複製與微型 Toast
         function copyToClipboard() {
-            const text = editor.value;
-            if(!text) return;
+            const preview = document.getElementById('preview-output');
+            if(preview.classList.contains('hidden')) return;
 
-            navigator.clipboard.writeText(text).then(() => {
-                const btn = document.getElementById('copy-btn');
-                const copyText = document.getElementById('copy-text');
-                const toast = document.getElementById('toast');
-                
-                // 按鈕狀態變更
-                btn.classList.add('bg-emerald-600', 'shadow-emerald-900/20');
-                btn.classList.remove('bg-blue-600', 'shadow-blue-900/20');
-                copyText.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg> 複製成功';
-                
-                // Toast 動畫
-                toast.classList.remove('translate-y-20', 'opacity-0');
-                
-                setTimeout(() => {
-                    btn.classList.remove('bg-emerald-600', 'shadow-emerald-900/20');
-                    btn.classList.add('bg-blue-600', 'shadow-blue-900/20');
-                    copyText.innerHTML = '<svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg> 一鍵複製';
-                    toast.classList.add('translate-y-20', 'opacity-0');
-                }, 2000);
+            navigator.clipboard.writeText(preview.innerText).then(() => {
+                showToast('已複製至剪貼簿！');
             });
         }
 
-        // 初始渲染
-        renderHistory();
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.querySelector('span').innerText = message;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 2500);
+        }
     </script>
 </body>
 </html>
