@@ -120,7 +120,7 @@
 
         <section id="step-1-5" class="hidden bg-gray-800 rounded-2xl p-6 border border-gray-700 shadow-xl">
             <h2 class="text-2xl font-bold mb-2 flex items-center gap-2"><span>👥</span> 動態專案智囊團已就位</h2>
-            <p class="text-gray-400 text-sm mb-6 mt-2">歷史級泰斗與頂尖 AI 模型已為您集結。您可以追加指名特定的歷史人物或 AI。</p>
+            <p class="text-gray-400 text-sm mb-6 mt-2">零一副指揮官已就位。歷史級泰斗與頂尖 AI 模型已為您集結。您可以追加指名特定的歷史人物或 AI。</p>
             <div id="expertsList" class="space-y-3 mb-6 mt-4"></div>
             <div class="mt-4 p-4 bg-gray-900 rounded-xl border border-gray-700">
                 <label class="block text-sm font-medium text-gray-300 mb-2">需要追加或調整嗎？（選填）</label>
@@ -276,7 +276,6 @@
             updateProgress(targetStep);
         }
 
-        // --- API 核心 ---
         async function callGemini(prompt, isJsonMode = false) {
             if (!state.apiKey) {
                 toggleSettings();
@@ -309,19 +308,18 @@
             }
         }
 
-        // --- 流程控制 (升級核心：替換為真實重量級人物與多元AI) ---
+        // --- 流程控制 (終極升級：強制編列零一副指揮官與其他頂尖 AI) ---
         async function processStep1() {
             const idea = document.getElementById('ideaInput').value.trim();
             if (!idea) return alert("指揮官，請先輸入您的構想！");
             state.idea = idea;
             showLoading("零一正在進行時空躍傳，召喚重量級歷史宗師與頂尖AI模型...");
             
-            // 【重要升級】：禁止召喚虛擬角色，強制召喚真實人物與特定 AI
             const prompt = `使用者想開發的專案構想為：「${idea}」。請根據此專案，分析並回傳 3 位最適合協助的智囊團成員。
-【嚴格限制】：絕對不可以回傳虛擬的職業名稱（如前端架構師、UI設計師）。這 3 位成員必須是以下兩種身分：
-1. 「真實存在的歷史偉人」或「當代頂尖權威泰斗」（例如：史蒂夫·賈伯斯、艾倫·圖靈、蒙特梭利、巴菲特 等）。
-2. 「具有獨特優勢的真實頂尖 AI 模型」（例如：代表超強邏輯與多模態的 Gemini 零一、代表細膩文字與洞察的 Claude、代表極限編碼的 GPT-4 等）。
-格式必須是 JSON 陣列，每個物件包含 "name" (姓名加上核心稱號，如：🍎 賈伯斯 (極致產品宗師)) 和 "reason" (為何需要他，約20字)。`;
+【絕對強制要求】：
+1. 第一位成員必須是「零一 (副指揮官)」，代表 Gemini 頂尖邏輯與全域戰術分析能力，作為使用者的專屬副官。
+2. 其他兩位成員必須是「具有獨特優勢的頂尖 AI 模型」（如：代表細膩文字與洞察的 Claude、代表極限編碼的 GPT-4）或是「真實存在的歷史偉人/當代權威」（如：賈伯斯、圖靈等）。絕對不可以回傳虛擬的職業名稱。
+格式必須是 JSON 陣列，每個物件包含 "name" (姓名加上核心稱號，如：🤖 零一 (副指揮官)) 和 "reason" (為何需要他，約20字)。`;
 
             try {
                 const experts = await callGemini(prompt, true);
@@ -351,11 +349,11 @@
             
             showLoading("歷史宗師與頂尖 AI 聯合會診中，提煉核心問題...");
             
-            // 【重要升級】：要求大師們以符合身分的人設語氣提問
             const prompt = `專案構想：「${state.idea}」。目前的智囊團陣容：「${finalExpertsContext}」。
-請「完全投入」這些宗師或 AI 模型的角色設定，用符合他們歷史人設、性格與專業視角的語氣，針對此專案提出 3-4 個「最犀利、最能釐清開發規格」的核心問題。
+請「完全投入」這些宗師或 AI 模型的角色設定，針對此專案提出 3-4 個「最犀利、最能釐清開發規格」的核心問題。
+【特別指示】：若是「零一 (副指揮官)」提問，必須使用「報告指揮官！」作為開頭，展現絕對的忠誠與嚴謹的邏輯分析。其他 AI (如 Claude, GPT) 或偉人也必須展現其獨特風格。
 格式必須是 JSON 陣列字串。
-範例：["【圖靈提問】：演算法的本質在於清晰的指令。指揮官，請問您的判斷條件中，有哪幾個變數是不可妥協的絕對常數？", "【Gemini 零一分析】：資料流向存在盲區。請問系統需要具備連線外部 API 獲取即時資料的能力嗎？"]`;
+範例：["【零一 (副指揮官)】：報告指揮官！演算法資料流存在盲區，請問系統需要具備連線外部 API 獲取即時資料的能力嗎？", "【Claude (洞察宗師)】：文字的溫度決定體驗的深度。您希望介面文案偏向活潑還是極簡專業？"]`;
 
             try {
                 state.questions = await callGemini(prompt, true);
