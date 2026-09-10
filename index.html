@@ -222,8 +222,8 @@
             throw new Error("Missing API Key");
         }
 
-        // ⚔️ 宗師級最終校準：與 2026 時代同步！升級為 v1 正式版與最新 3.8-flash 模型！
-        const endpoint = `https://generativelanguage.googleapis.com/v1/models/gemini-3.8-flash:generateContent?key=${state.apiKey}`;
+        // ⚔️ 宗師級精準校準：切換至備用且穩定的 3.6-flash 分流端點，避開 3.8 滿載車潮！
+        const endpoint = `https://generativelanguage.googleapis.com/v1/models/gemini-3.6-flash:generateContent?key=${state.apiKey}`;
         let finalPrompt = prompt;
         if (isJsonMode) finalPrompt += `\n\n**CRITICAL: You MUST output ONLY valid JSON format. Do NOT wrap in markdown blockquotes like \`\`\`json. Just the raw JSON.**`;
 
