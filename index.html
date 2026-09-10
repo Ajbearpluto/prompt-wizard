@@ -1,4 +1,169 @@
-<!-- 宗師版核心大腦：直接植入 HTML 斷絕快取干擾 -->
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prompt Wizard | 晨曦詠唱精靈</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                fontFamily: {
+                    sans: ['Inter', 'Noto Sans TC', 'sans-serif'],
+                    mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
+                }
+            }
+        }
+    </script>
+    <style>
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.1); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(0, 0, 0, 0.2); }
+        
+        /* 明亮剔透的毛玻璃效果 */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.55);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            box-shadow: 0 10px 40px -10px rgba(245, 158, 11, 0.1);
+        }
+        .glow-focus:focus-within {
+            box-shadow: 0 0 25px rgba(245, 158, 11, 0.2);
+            border-color: rgba(245, 158, 11, 0.4);
+        }
+        .loader {
+            border-top-color: #f59e0b;
+            -webkit-animation: spinner 1s linear infinite;
+            animation: spinner 1s linear infinite;
+        }
+        @keyframes spinner {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50 text-slate-800 h-screen w-full flex overflow-hidden selection:bg-amber-500/30 font-sans relative">
+
+    <!-- 柔和的陽光背景光暈 -->
+    <div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-amber-200/40 rounded-full blur-[120px] pointer-events-none"></div>
+    <div class="absolute bottom-[-10%] right-[-10%] w-[30%] h-[30%] bg-orange-300/30 rounded-full blur-[100px] pointer-events-none"></div>
+
+    <!-- API 設定 Modal -->
+    <div id="settingsModal" class="hidden fixed inset-0 bg-slate-900/30 backdrop-blur-md z-[100] flex items-center justify-center">
+        <div class="bg-white/90 p-6 rounded-2xl border border-white w-full max-w-md shadow-2xl relative">
+            <h2 class="text-lg font-bold text-slate-800 mb-4">⚙️ 設定 API 能源金鑰</h2>
+            <p class="text-sm text-slate-500 mb-4">系統需綁定 Gemini API 以驅動宗師會診。金鑰僅加密儲存於本機瀏覽器。</p>
+            <input type="password" id="apiKeyInput" placeholder="輸入金鑰..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-slate-800 focus:outline-none focus:border-amber-500 mb-6">
+            <div class="flex justify-end gap-3">
+                <button onclick="toggleSettings()" class="px-4 py-2 rounded-xl text-slate-500 hover:bg-slate-100 transition font-medium">取消</button>
+                <button onclick="saveApiKey()" class="px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 rounded-xl text-white font-bold transition shadow-lg shadow-amber-500/30">鎖定並儲存</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 左側：記憶宮殿側邊欄 -->
+    <aside class="w-80 glass-panel flex flex-col border-r border-white/60 z-10 relative">
+        <div class="p-6 border-b border-white/60 flex justify-between items-center">
+            <h1 class="text-lg font-semibold text-slate-800 tracking-wide flex items-center gap-2">
+                <span class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse shadow-[0_0_8px_rgba(245,158,11,0.8)]"></span>
+                Memory Palace
+            </h1>
+            <div class="flex gap-2">
+                <button onclick="clearHistoryCache()" class="text-slate-400 hover:text-red-500 transition" title="清除異常紀錄">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                </button>
+                <button onclick="toggleSettings()" class="text-slate-400 hover:text-amber-500 transition" title="API 設定">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                </button>
+            </div>
+        </div>
+        <div id="history-container" class="flex-1 overflow-y-auto p-4 space-y-3">
+            <!-- 歷史紀錄動態載入 -->
+        </div>
+    </aside>
+
+    <!-- 主工作區 -->
+    <main class="flex-1 flex flex-col md:flex-row h-full relative z-10">
+        
+        <!-- 全域載入遮罩 -->
+        <div id="loadingOverlay" class="hidden absolute inset-0 z-40 bg-white/70 backdrop-blur-md flex-col items-center justify-center">
+            <div class="loader ease-linear rounded-full border-4 border-t-4 border-amber-200 h-14 w-14 mb-4"></div>
+            <p class="text-amber-600 font-bold tracking-wide animate-pulse" id="loadingText">與零一神經網路同步中...</p>
+        </div>
+
+        <!-- 創作與會診區 (中欄) -->
+        <section class="flex-1 flex flex-col p-8 border-r border-white/60 relative">
+            <div id="state-input" class="flex-1 flex flex-col h-full">
+                <div class="mb-6">
+                    <h2 class="text-2xl font-bold text-slate-800 mb-2">💡 提示詞鑄造區</h2>
+                    <p class="text-sm text-slate-500 font-medium">寫下您的原始需求，我們將為您轉譯為機器最易懂的語言。</p>
+                </div>
+                <div class="flex-1 relative glow-focus transition-all duration-300 rounded-2xl glass-panel flex flex-col shadow-sm">
+                    <textarea 
+                        id="ideaInput"
+                        class="w-full flex-1 bg-transparent p-6 text-slate-700 resize-none focus:outline-none text-base leading-relaxed placeholder-slate-400"
+                        placeholder="例如：我想結合太極系統的 20MA 跟 60MA 來寫一支選股條件..."
+                    ></textarea>
+                </div>
+                <div class="mt-6 flex justify-end">
+                    <button onclick="startConsultation()" class="px-8 py-3.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 rounded-xl text-white font-bold transition shadow-lg shadow-amber-500/30 flex items-center gap-2 transform hover:-translate-y-0.5">
+                        召喚智囊團會診
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 狀態 2：宗師會診提問 -->
+            <div id="state-consult" class="hidden flex-1 flex flex-col h-full">
+                <div class="mb-6 flex justify-between items-center">
+                    <div>
+                        <h2 class="text-2xl font-bold text-slate-800 mb-2">⚔️ 宗師會診中</h2>
+                    </div>
+                    <button onclick="resetToInput()" class="text-sm text-slate-400 hover:text-amber-500 transition font-medium bg-white/50 px-3 py-1.5 rounded-lg border border-white/60 shadow-sm">取消重來</button>
+                </div>
+                <div class="flex-1 overflow-y-auto pr-2 custom-scrollbar">
+                    <div id="questionsContainer" class="space-y-6"></div>
+                </div>
+                <div class="mt-6 flex justify-end">
+                    <button onclick="forgeUltimatePrompt()" class="px-8 py-3.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 rounded-xl text-white font-bold transition shadow-lg shadow-emerald-500/30 flex items-center gap-2 transform hover:-translate-y-0.5">
+                        ✨ 鍛造終極詠唱
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- 終極詠唱輸出區 (右欄) -->
+        <section class="flex-1 flex flex-col p-8 bg-white/30 backdrop-blur-sm relative">
+            <div class="mb-6 flex justify-between items-end">
+                <h2 class="text-2xl font-bold text-slate-800 mb-1">Final Prompt</h2>
+                <button id="copy-btn" onclick="copyToClipboard()" class="group relative px-5 py-2.5 font-bold text-slate-700 bg-white rounded-xl transition hover:bg-slate-50 flex items-center gap-2 overflow-hidden border border-slate-200 shadow-sm hover:shadow-md">
+                    <span id="copy-text" class="relative z-10 flex items-center gap-2">
+                        <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                        一鍵複製
+                    </span>
+                </button>
+            </div>
+
+            <div class="flex-1 glass-panel rounded-2xl p-6 overflow-y-auto relative shadow-sm">
+                <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center text-slate-400 pointer-events-none">
+                    <svg class="w-14 h-14 mb-4 opacity-30 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
+                    <p class="text-sm font-medium tracking-wide">等待智囊團鍛造，轉譯為 AI 專屬語言</p>
+                </div>
+                <pre id="preview-output" class="font-mono text-sm text-slate-700 whitespace-pre-wrap leading-relaxed hidden"></pre>
+            </div>
+        </section>
+    </main>
+
+    <!-- 微互動 Toast 提示 -->
+    <div id="toast" class="fixed bottom-8 right-8 px-6 py-3 bg-white text-slate-800 rounded-xl shadow-2xl border border-slate-100 transform translate-y-20 opacity-0 transition-all duration-300 flex items-center gap-3 z-50">
+        <div class="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
+        <span class="text-sm font-bold">已複製至剪貼簿！</span>
+    </div>
+
+    <!-- 終極陣法：大腦與骨架合一 -->
     <script>
     let state = {
         apiKey: localStorage.getItem('gemini_api_key') || '',
@@ -8,7 +173,7 @@
     };
 
     window.onload = () => {
-        console.log("📡 [系統日誌] 萬物歸一陣啟動，JS 引擎運轉正常！");
+        console.log("📡 [系統日誌] 終極萬物歸一陣啟動，JS 引擎運轉正常！");
         if (!state.apiKey) toggleSettings();
         const keyInput = document.getElementById('apiKeyInput');
         if(keyInput) keyInput.value = state.apiKey;
@@ -20,7 +185,7 @@
     }
 
     function clearHistoryCache() {
-        if(confirm("確定要清除所有歷史紀錄嗎？這可以解決 undefined 的顯示問題。")) {
+        if(confirm("確定要清除所有歷史紀錄嗎？")) {
             localStorage.removeItem('prompt_wizard_history');
             state.promptHistory = [];
             renderHistory();
@@ -57,7 +222,6 @@
             throw new Error("Missing API Key");
         }
 
-        // 精準鎖定 1.5-flash 與 v1beta 端點
         const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${state.apiKey}`;
         let finalPrompt = prompt;
         if (isJsonMode) finalPrompt += `\n\n**CRITICAL: You MUST output ONLY valid JSON format. Do NOT wrap in markdown blockquotes like \`\`\`json. Just the raw JSON.**`;
@@ -183,3 +347,5 @@
         }, 2500);
     }
     </script>
+</body>
+</html>
