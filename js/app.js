@@ -50,8 +50,8 @@ async function callGemini(prompt, isJsonMode = false) {
         toggleSettings();
         throw new Error("Missing API Key");
     }
-    // 💡 零一已為您校準為正確的模型端點 (加上了 -latest 以避開 404 錯誤)
-    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${state.apiKey}`;
+    // 💡 零一已為您切換為最穩定貫通的 gemini-pro 模型端點
+    const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=${state.apiKey}`;
     
     let finalPrompt = prompt;
     if (isJsonMode) finalPrompt += `\n\n**CRITICAL: You MUST output ONLY valid JSON format. Do NOT wrap in markdown blockquotes like \`\`\`json. Just the raw JSON.**`;
