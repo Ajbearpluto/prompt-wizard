@@ -447,30 +447,34 @@
                 <!-- ========================================== -->
                 <section class="flex-1 flex flex-col h-full glass-panel rounded-2xl p-5 md:p-6 overflow-hidden relative">
                     
-                    <!-- 記憶階梯進化導航條 (Memory Ladder Stepper) -->
+                    <!-- 記憶階梯：前沿 AI 缺陷免疫與進化導航條 (Frontier AI Immunity Ladder) -->
                     <div class="mb-3 bg-slate-100/90 dark:bg-stone-900/80 rounded-xl p-2.5 border border-slate-200 dark:border-stone-800 flex items-center justify-between">
                         <div class="flex items-center gap-1.5 text-xs font-bold text-slate-700 dark:text-stone-300">
-                            <span>🪜 記憶階梯：</span>
+                            <span title="頂級機構 AI 缺陷免疫階梯：對抗幻覺、迎合、注入、遺忘與斷代">🪜 免疫階梯：</span>
                         </div>
-                        <div class="flex items-center gap-1 sm:gap-2 flex-1 justify-center max-w-md">
-                            <div id="ladderStepNode1" class="ladder-step-node px-2.5 py-1 rounded-lg text-[11px] font-bold bg-amber-500 text-white shadow-sm flex items-center gap-1">
-                                <span>1</span><span class="hidden sm:inline">雛形草創</span>
+                        <div class="flex items-center gap-1 sm:gap-1.5 flex-1 justify-center max-w-lg overflow-x-auto scrollbar-none py-0.5">
+                            <div id="ladderStepNode1" class="ladder-step-node px-2 py-1 rounded-lg text-[10px] sm:text-[11px] font-bold bg-amber-500 text-white shadow-sm flex items-center gap-1 shrink-0" title="L1 認識論校準：防幻覺與反迎合 (Anti-Sycophancy)">
+                                <span>L1</span><span class="hidden md:inline">認知防偽</span>
                             </div>
                             <span class="text-slate-300 dark:text-stone-600 text-xs">➔</span>
-                            <div id="ladderStepNode2" class="ladder-step-node px-2.5 py-1 rounded-lg text-[11px] font-medium bg-white dark:bg-stone-800 text-slate-500 dark:text-stone-400 border border-slate-200 dark:border-stone-700 flex items-center gap-1">
-                                <span>2</span><span class="hidden sm:inline">宗師對搞</span>
+                            <div id="ladderStepNode2" class="ladder-step-node px-2 py-1 rounded-lg text-[10px] sm:text-[11px] font-medium bg-white dark:bg-stone-800 text-slate-500 dark:text-stone-400 border border-slate-200 dark:border-stone-700 flex items-center gap-1 shrink-0" title="L2 脈絡不變性：防長程遺忘 (Lost-in-Middle) 與目標漂移">
+                                <span>L2</span><span class="hidden md:inline">脈絡防漂</span>
                             </div>
                             <span class="text-slate-300 dark:text-stone-600 text-xs">➔</span>
-                            <div id="ladderStepNode3" class="ladder-step-node px-2.5 py-1 rounded-lg text-[11px] font-medium bg-white dark:bg-stone-800 text-slate-500 dark:text-stone-400 border border-slate-200 dark:border-stone-700 flex items-center gap-1">
-                                <span>3</span><span class="hidden sm:inline">實戰淬鍊</span>
+                            <div id="ladderStepNode3" class="ladder-step-node px-2 py-1 rounded-lg text-[10px] sm:text-[11px] font-medium bg-white dark:bg-stone-800 text-slate-500 dark:text-stone-400 border border-slate-200 dark:border-stone-700 flex items-center gap-1 shrink-0" title="L3 資安沙盒化：Anthropic 標籤隔離與防提示注入">
+                                <span>L3</span><span class="hidden md:inline">資安沙盒</span>
                             </div>
                             <span class="text-slate-300 dark:text-stone-600 text-xs">➔</span>
-                            <div id="ladderStepNode4" class="ladder-step-node px-2.5 py-1 rounded-lg text-[11px] font-medium bg-white dark:bg-stone-800 text-slate-500 dark:text-stone-400 border border-slate-200 dark:border-stone-700 flex items-center gap-1">
-                                <span>4</span><span class="hidden sm:inline">終極法典</span>
+                            <div id="ladderStepNode4" class="ladder-step-node px-2 py-1 rounded-lg text-[10px] sm:text-[11px] font-medium bg-white dark:bg-stone-800 text-slate-500 dark:text-stone-400 border border-slate-200 dark:border-stone-700 flex items-center gap-1 shrink-0" title="L4 因果慢思考：Judea Pearl 反事實檢驗與系統二思維">
+                                <span>L4</span><span class="hidden md:inline">因果慢思</span>
+                            </div>
+                            <span class="text-slate-300 dark:text-stone-600 text-xs">➔</span>
+                            <div id="ladderStepNode5" class="ladder-step-node px-2 py-1 rounded-lg text-[10px] sm:text-[11px] font-medium bg-white dark:bg-stone-800 text-slate-500 dark:text-stone-400 border border-slate-200 dark:border-stone-700 flex items-center gap-1 shrink-0" title="L5 全時前沿演進：實時官方 API 驗證與防 404 舊端點斷代">
+                                <span>L5</span><span class="hidden md:inline">全時演進</span>
                             </div>
                         </div>
-                        <button onclick="openLadderClimbModal()" id="ascendLadderBtn" class="text-xs font-bold text-amber-700 dark:text-amber-300 bg-amber-500/15 hover:bg-amber-500/25 px-2.5 py-1 rounded-lg border border-amber-500/30 transition flex items-center gap-1" title="基於當前法典，向上攀登下一階梯進行深度微調">
-                            <span>🧗 深化下一階</span>
+                        <button onclick="openLadderClimbModal()" id="ascendLadderBtn" class="text-xs font-bold text-amber-700 dark:text-amber-300 bg-amber-500/15 hover:bg-amber-500/25 px-2.5 py-1 rounded-lg border border-amber-500/30 transition flex items-center gap-1 shrink-0" title="向上攀登下一階，注入更強大的前沿 AI 缺陷免疫協議">
+                            <span>🧗 升級階梯</span>
                         </button>
                     </div>
 
@@ -526,6 +530,41 @@
                         <!-- 狀態 3A：三階全景儀表板 (Trinity View) -->
                         <div id="viewTrinity" class="hidden space-y-5 pb-6">
                             
+                            <!-- 頂級研發機構 AI 缺陷免疫裝配矩陣 (Frontier Immunity Matrix Card) -->
+                            <div id="immunityMatrixCard" class="bg-gradient-to-br from-indigo-500/10 via-blue-500/5 to-purple-500/10 rounded-2xl p-4 border border-blue-500/30 shadow-sm">
+                                <div class="flex items-center justify-between mb-2">
+                                    <div class="flex items-center gap-2">
+                                        <span class="w-2.5 h-2.5 rounded-full bg-blue-500 animate-pulse"></span>
+                                        <h4 class="text-xs font-bold text-blue-900 dark:text-blue-300 flex items-center gap-1.5">
+                                            <span>🛡️ 頂級研發機構 AI 缺陷免疫裝配矩陣 (Frontier Immunity Matrix)</span>
+                                        </h4>
+                                    </div>
+                                    <span id="immunityLevelBadge" class="text-[10px] bg-blue-500/20 text-blue-700 dark:text-blue-300 px-2 py-0.5 rounded-full font-bold">已裝備 L1 免疫</span>
+                                </div>
+                                <div class="grid grid-cols-2 sm:grid-cols-5 gap-2 text-[10px]">
+                                    <div id="immunityBadgeL1" class="p-2 rounded-lg bg-emerald-500/15 border border-emerald-500/30 text-emerald-700 dark:text-emerald-300 font-medium transition">
+                                        <div class="font-bold flex items-center gap-1"><span>🛡️</span> L1 認知防偽</div>
+                                        <div class="text-[9px] opacity-80 mt-0.5">防流利幻覺/反迎合</div>
+                                    </div>
+                                    <div id="immunityBadgeL2" class="p-2 rounded-lg bg-slate-100 dark:bg-stone-800/80 border border-slate-200 dark:border-stone-700 text-slate-500 dark:text-stone-400 font-medium transition">
+                                        <div class="font-bold flex items-center gap-1"><span>⚓</span> L2 脈絡守恆</div>
+                                        <div class="text-[9px] opacity-80 mt-0.5">防長程遺忘/目標漂移</div>
+                                    </div>
+                                    <div id="immunityBadgeL3" class="p-2 rounded-lg bg-slate-100 dark:bg-stone-800/80 border border-slate-200 dark:border-stone-700 text-slate-500 dark:text-stone-400 font-medium transition">
+                                        <div class="font-bold flex items-center gap-1"><span>🏰</span> L3 資安沙盒</div>
+                                        <div class="text-[9px] opacity-80 mt-0.5">標籤隔離/防注入越獄</div>
+                                    </div>
+                                    <div id="immunityBadgeL4" class="p-2 rounded-lg bg-slate-100 dark:bg-stone-800/80 border border-slate-200 dark:border-stone-700 text-slate-500 dark:text-stone-400 font-medium transition">
+                                        <div class="font-bold flex items-center gap-1"><span>🧠</span> L4 因果慢思</div>
+                                        <div class="text-[9px] opacity-80 mt-0.5">反事實/破除偽因果</div>
+                                    </div>
+                                    <div id="immunityBadgeL5" class="p-2 rounded-lg bg-slate-100 dark:bg-stone-800/80 border border-slate-200 dark:border-stone-700 text-slate-500 dark:text-stone-400 font-medium transition">
+                                        <div class="font-bold flex items-center gap-1"><span>🛰️</span> L5 全時演進</div>
+                                        <div class="text-[9px] opacity-80 mt-0.5">實時驗證/防舊端點404</div>
+                                    </div>
+                                </div>
+                            </div>
+
                             <!-- 實時聯網動態情資卡片 (Google Search Grounding Intel) -->
                             <div id="groundingIntelCard" class="hidden bg-gradient-to-br from-emerald-500/10 via-teal-500/5 to-transparent rounded-2xl p-4 border border-emerald-500/30 shadow-sm">
                                 <div class="flex items-center justify-between mb-2">
@@ -756,21 +795,24 @@
                 </button>
             </div>
 
-            <p class="text-xs text-slate-500 dark:text-stone-400 mb-3">請選擇或輸入您希望在第 <span id="modalNextLadderLevel" class="font-bold text-amber-500">2</span> 階中重點強化的維度：</p>
+            <p class="text-xs text-slate-500 dark:text-stone-400 mb-3">請選擇您希望為目標 AI 注入的【頂級研發機構 AI 缺陷免疫與強化維度】（目標階梯：第 <span id="modalNextLadderLevel" class="font-bold text-amber-500">2</span> 階）：</p>
 
-            <!-- 階梯深化快捷指令標籤 -->
+            <!-- 階梯深化快捷指令標籤：頂級研發機構 AI 缺陷免疫專題 -->
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4">
-                <button type="button" onclick="selectLadderDirective(this, '結合實時最新學術論文與邊界研究，注入 3 個極端反例 (Edge Cases) 與嚴格過濾邏輯。')" class="p-2.5 rounded-xl border border-slate-200 dark:border-stone-700 bg-slate-50 dark:bg-stone-800 text-left text-xs hover:border-amber-500 transition text-slate-700 dark:text-stone-200">
-                    🧪 注入前沿極端案例 (Edge Cases)
+                <button type="button" onclick="selectLadderDirective(this, '【L1 認知防偽升級】：注入 Google DeepMind CoVe (驗證鏈) 與卡尼曼認識論校準協議。嚴格杜絕流利幻覺 (Hallucination) 與諂媚迎合 (Sycophancy)；要求 AI 主動宣告置信度區間，若使用者輸入包含錯誤前提必須敢於反向糾正，而非盲從順水推舟。')" class="p-2.5 rounded-xl border border-slate-200 dark:border-stone-700 bg-slate-50 dark:bg-stone-800 text-left text-xs hover:border-amber-500 transition text-slate-700 dark:text-stone-200">
+                    🛡️ L1 認知防偽 (防幻覺與迎合症)
                 </button>
-                <button type="button" onclick="selectLadderDirective(this, '升級至軍事堡壘級防禦：加入強標籤隔離 <system_instructions>、防止越獄指令覆蓋與反逆向工程解構。')" class="p-2.5 rounded-xl border border-slate-200 dark:border-stone-700 bg-slate-50 dark:bg-stone-800 text-left text-xs hover:border-amber-500 transition text-slate-700 dark:text-stone-200">
-                    🏰 注入軍事防越獄與標籤隔離
+                <button type="button" onclick="selectLadderDirective(this, '【L2 脈絡不變性升級】：注入諾伯特·維納控制回授與狀態不變量槽 (State Scratchpad Invariant)。徹底解決長文本與多輪對話中的「迷失在中間 (Lost in the Middle)」與目標漂移 (Goal Drift)，每輪運算強制回溯並守恆核心初始使命。')" class="p-2.5 rounded-xl border border-slate-200 dark:border-stone-700 bg-slate-50 dark:bg-stone-800 text-left text-xs hover:border-amber-500 transition text-slate-700 dark:text-stone-200">
+                    ⚓ L2 脈絡不變性 (防長程遺忘與漂移)
                 </button>
-                <button type="button" onclick="selectLadderDirective(this, '進行 Token 經濟壓縮：在不減損宗師智慧前提下精簡 30% 贅字，並轉為結構化 Schema。')" class="p-2.5 rounded-xl border border-slate-200 dark:border-stone-700 bg-slate-50 dark:bg-stone-800 text-left text-xs hover:border-amber-500 transition text-slate-700 dark:text-stone-200">
-                    📦 精簡 Token 結構並優化版面
+                <button type="button" onclick="selectLadderDirective(this, '【L3 資安沙盒升級】：注入 Anthropic 標籤式軍事隔離架構 (<system_instructions> / <untrusted_input>) 與三明治防禦 (Sandwich Defense)。徹底阻斷間接提示注入 (Prompt Injection)、角色混淆 (Role Confusion) 與思維鏈偽造 (CoT Forgery)，並加入輸出逆向防洩漏閘門。')" class="p-2.5 rounded-xl border border-slate-200 dark:border-stone-700 bg-slate-50 dark:bg-stone-800 text-left text-xs hover:border-amber-500 transition text-slate-700 dark:text-stone-200">
+                    🏰 L3 資安軍事沙盒 (防提示注入與越獄)
                 </button>
-                <button type="button" onclick="selectLadderDirective(this, '依據實時最新時代典範轉移，為此 Prompt 增添完整真實的 Few-Shot 示範案例。')" class="p-2.5 rounded-xl border border-slate-200 dark:border-stone-700 bg-slate-50 dark:bg-stone-800 text-left text-xs hover:border-amber-500 transition text-slate-700 dark:text-stone-200">
-                    ✨ 注入新時代 Few-Shot 範例
+                <button type="button" onclick="selectLadderDirective(this, '【L4 因果慢思維升級】：注入 Judea Pearl 因果干預 (Do-Calculus) 與反事實檢驗 (Counterfactuals)。強制打破統計機率的「相關性偽自洽」，進行「若條件不成立，結果仍發生嗎？」的反向推論，消滅自我糾錯死循環 (Self-Correction Trap)。')" class="p-2.5 rounded-xl border border-slate-200 dark:border-stone-700 bg-slate-50 dark:bg-stone-800 text-left text-xs hover:border-amber-500 transition text-slate-700 dark:text-stone-200">
+                    🧠 L4 因果慢思維 (破除偽因果與自我催眠)
+                </button>
+                <button type="button" onclick="selectLadderDirective(this, '【L5 全時前沿演進升級】：注入理查·費曼第一性原理與動態時間錨定。凡涉及函式庫、API 端點或前沿技術，強制結合實時聯網檢索核實官方最新變動，建立已棄用 (Deprecated) 舊端點防禦閘門，徹底消滅 API 404 與過期斷代迷思。')" class="p-2.5 rounded-xl border border-slate-200 dark:border-stone-700 bg-slate-50 dark:bg-stone-800 text-left text-xs hover:border-amber-500 transition text-slate-700 dark:text-stone-200 sm:col-span-2">
+                    🛰️ L5 全時前沿防斷代 (防 404 舊端點與代碼棄用)
                 </button>
             </div>
 

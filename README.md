@@ -15,13 +15,14 @@
 - **拒絕盲人摸象**：系統開機或輸入 API Key 時，自動向 Google 官方端點 (`GET /v1beta/models`) 實時探測目前真正存活且開通之有效模型清單（支援 `gemini-3.5-flash`、`gemini-3.8-flash`、`gemini-3.1-flash-lite`、`gemini-flash-latest` 等）。
 - **自適應防 404 自愈鏈**：若遇到端點更迭、404 Not Found 或高負載 503，系統自動捕捉異常並切換至下一個有效官方端點重試，杜絕程式碼「找不到大腦」而崩潰的歷史失誤！
 
-### 2. 🪜 記憶階梯進化系統 (The Memory Ladder)
-- **拒絕單次平面產出**：真正強悍的 Prompt 是一步步攀登淬鍊而成的：
-  - **🪜 階梯 1 (雛形草創 · Prototype)**：模糊需求梳理、盲點剖析與基礎骨架。
-  - **🪜 階梯 2 (宗師對搞 · Grandmaster Debate)**：跨領域理論碰撞、修辭三段論、第一性原理注入。
-  - **🪜 階梯 3 (實戰淬鍊 · Adversarial Hardening)**：極端邊界案例 (Edge Cases) 壓力測試、少樣本 (Few-Shot) 與防越獄標籤隔離。
-  - **🪜 階梯 4 (終極法典 · Production Sovereign)**：隨插即用、嚴密邊界閉環之工業級法典。
-- **一鍵攀登深化**：點擊「**🧗 深化下一階**」，系統自動將當前產出的 Prompt 封裝為堅實基石，帶著前階記憶向上突破！
+### 2. 🪜 記憶階梯：頂級研發機構 AI 缺陷免疫進化系統 (Frontier AI Dilemmas Immunity Ladder)
+- **拒絕脆弱的平面指令**：深入攻克當前 OpenAI、Anthropic、Google DeepMind 等頂級實驗室所面臨的五大本質 AI 難題，將相應宗師的免疫協議深層寫入 Prompt 的底層約束：
+  - **🪜 階梯 L1 (認知防偽 · Epistemic Truth)**：攻克「流利幻覺」與「討好型迎合 (Sycophancy)」。注入 Google DeepMind CoVe (驗證鏈) 與卡尼曼認識論校準，知之為知之，主動糾正錯誤假設。
+  - **🪜 階梯 L2 (脈絡守恆 · Context Invariance)**：攻克長文本「迷失在中間 (Lost-in-Middle)」與「目標漂移 (Goal Drift)」。注入維納反饋控制與狀態不變量槽 (State Scratchpad Invariant)。
+  - **🪜 階梯 L3 (資安沙盒 · Zero-Trust Sandbox)**：攻克「間接提示注入 (Prompt Injection)」、「角色混淆」與「思維鏈偽造 (CoT Forgery)」。注入 Anthropic 標籤隔離與三明治防禦。
+  - **🪜 階梯 L4 (因果慢思 · Causal Reasoning)**：攻克「相關性當因果」與「自我糾錯死循環 (Self-Correction Trap)」。注入 Judea Pearl 因果干預 (Do-Calculus & 反事實檢驗) 與慢思考分支檢驗。
+  - **🪜 階梯 L5 (全時演進 · Perpetual Grounding)**：攻克「404 舊端點迷思」、「知識截斷」與「代碼庫棄用 (Deprecated)」。注入理查·費曼第一性原理、動態實時時間錨點與即時官方 API 驗證。
+- **一鍵攀登深化**：點擊「**🧗 升級階梯**」，可選擇任一維度進行免疫注入，讓產出的法典自帶國際頂級實驗室級別的防禦抗體！
 
 ### 3. 🌐 全時動態時間軸聯網搜尋 (Real-Time Search Grounding with Temporal Anchor)
 - **隨真實時間動態推進（非靜態年份）**：每次發起鍛造時，系統自動捕捉客戶端當下毫秒級時間戳記（例如 `2026-09-25 13:00`），作為「實時時間錨點 (Dynamic Real-Time Anchor)」注入提示詞。今天發問檢索今天最新，明天發問檢索明天最新！
