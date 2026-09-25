@@ -1,17 +1,42 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="zh-TW" class="h-full">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Prompt Wizard | 晨曦詠唱精靈</title>
+    <meta name="description" content="萬相星域 · Prompt Wizard - 零一全知宗師中介樞紐。全域學術檢索、跨界宗師進駐、時代典範轉移校準、機器零歧義執行。">
+    <!-- Inline SVG Favicon (避免 favicon.ico 404 並提供星域圖示) -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌌</text></svg>">
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Noto+Sans+TC:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- Markdown Parser (marked.js) -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600&family=Inter:wght@300;400;500;600;700;800;900&family=Noto+Sans+TC:wght@300;400;500;700;900&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
+            darkMode: 'class',
             theme: {
-                fontFamily: {
-                    sans: ['Inter', 'Noto Sans TC', 'sans-serif'],
-                    mono: ['ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'Noto Sans TC', 'sans-serif'],
+                        mono: ['Fira Code', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', 'monospace'],
+                    },
+                    colors: {
+                        amber: {
+                            50: '#fffbeb',
+                            100: '#fef3c7',
+                            200: '#fde68a',
+                            300: '#fcd34d',
+                            400: '#fbbf24',
+                            500: '#f59e0b',
+                            600: '#d97706',
+                            700: '#b45309',
+                            800: '#92400e',
+                            900: '#78350f',
+                        }
+                    }
                 }
             }
         }
@@ -19,334 +44,882 @@
     <style>
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(0, 0, 0, 0.1); border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(0, 0, 0, 0.2); }
-        
-        /* 明亮剔透的毛玻璃效果 */
+        ::-webkit-scrollbar-thumb { background: rgba(245, 158, 11, 0.25); border-radius: 9999px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(245, 158, 11, 0.45); }
+
+        /* 晨曦暖金與萬相星域水晶玻璃態 */
         .glass-panel {
-            background: rgba(255, 255, 255, 0.55);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            border: 1px solid rgba(255, 255, 255, 0.8);
-            box-shadow: 0 10px 40px -10px rgba(245, 158, 11, 0.1);
+            background: rgba(255, 255, 255, 0.68);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.85);
+            box-shadow: 0 12px 36px -8px rgba(245, 158, 11, 0.12);
         }
+        .dark .glass-panel {
+            background: rgba(22, 20, 26, 0.78);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(245, 158, 11, 0.18);
+            box-shadow: 0 16px 40px -10px rgba(0, 0, 0, 0.6);
+        }
+
         .glow-focus:focus-within {
-            box-shadow: 0 0 25px rgba(245, 158, 11, 0.2);
-            border-color: rgba(245, 158, 11, 0.4);
+            box-shadow: 0 0 28px rgba(245, 158, 11, 0.25);
+            border-color: rgba(245, 158, 11, 0.5);
         }
-        .loader {
+
+        .loader-ring {
             border-top-color: #f59e0b;
-            -webkit-animation: spinner 1s linear infinite;
-            animation: spinner 1s linear infinite;
+            animation: spin 1s linear infinite;
         }
-        @keyframes spinner {
+        @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+
+        /* 晶燦動態漸變文字 */
+        .gradient-text {
+            background: linear-gradient(135deg, #d97706 0%, #f59e0b 50%, #ea580c 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .dark .gradient-text {
+            background: linear-gradient(135deg, #fbbf24 0%, #f59e0b 50%, #fb923c 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* 星域節點選取微動畫 */
+        .chip-selectable {
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .chip-selectable.active {
+            background: linear-gradient(135deg, #f59e0b, #ea580c);
+            color: #ffffff;
+            box-shadow: 0 4px 14px rgba(245, 158, 11, 0.35);
+            border-color: transparent;
+        }
+
+        /* 記憶階梯徽章動畫 */
+        .ladder-step-node {
+            transition: all 0.3s ease;
+        }
+        .ladder-step-node.active {
+            background: linear-gradient(135deg, #f59e0b, #ea580c);
+            color: white;
+            box-shadow: 0 0 16px rgba(245, 158, 11, 0.5);
+        }
+
+        /* Markdown 內容渲染優化 */
+        .markdown-content h1, .markdown-content h2, .markdown-content h3 {
+            font-weight: 700;
+            color: inherit;
+            margin-top: 1.25rem;
+            margin-bottom: 0.5rem;
+        }
+        .markdown-content h1 { font-size: 1.5rem; }
+        .markdown-content h2 { font-size: 1.25rem; color: #d97706; }
+        .dark .markdown-content h2 { color: #fbbf24; }
+        .markdown-content h3 { font-size: 1.1rem; }
+        .markdown-content p { margin-bottom: 0.75rem; line-height: 1.7; }
+        .markdown-content ul, .markdown-content ol { margin-left: 1.5rem; margin-bottom: 0.75rem; list-style-type: disc; }
+        .markdown-content code {
+            font-family: 'Fira Code', monospace;
+            background: rgba(245, 158, 11, 0.12);
+            padding: 0.15rem 0.4rem;
+            border-radius: 0.375rem;
+            font-size: 0.875em;
+        }
+        .markdown-content pre code {
+            display: block;
+            padding: 1rem;
+            background: rgba(15, 23, 42, 0.95);
+            color: #f8fafc;
+            border-radius: 0.75rem;
+            overflow-x: auto;
+        }
+        .markdown-content blockquote {
+            border-left: 4px solid #f59e0b;
+            padding-left: 1rem;
+            margin: 0.75rem 0;
+            color: #64748b;
+            font-style: italic;
+        }
+        .dark .markdown-content blockquote { color: #94a3b8; }
     </style>
 </head>
-<body class="bg-gradient-to-br from-amber-50 via-orange-50 to-rose-50 text-slate-800 h-screen w-full flex overflow-hidden selection:bg-amber-500/30 font-sans relative">
+<body class="bg-gradient-to-br from-amber-50 via-orange-50/70 to-rose-50/60 dark:from-stone-950 dark:via-neutral-900 dark:to-stone-900 text-slate-800 dark:text-stone-100 h-screen w-full flex flex-col overflow-hidden font-sans selection:bg-amber-500/30 transition-colors duration-300">
 
-    <!-- 柔和的陽光背景光暈 -->
-    <div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-amber-200/40 rounded-full blur-[120px] pointer-events-none"></div>
-    <div class="absolute bottom-[-10%] right-[-10%] w-[30%] h-[30%] bg-orange-300/30 rounded-full blur-[100px] pointer-events-none"></div>
+    <!-- 柔和星域神諭光暈 -->
+    <div class="fixed top-[-10%] left-[-10%] w-[45%] h-[45%] bg-amber-300/30 dark:bg-amber-500/10 rounded-full blur-[140px] pointer-events-none"></div>
+    <div class="fixed bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-orange-400/20 dark:bg-purple-600/10 rounded-full blur-[120px] pointer-events-none"></div>
 
-    <!-- API 設定 Modal -->
-    <div id="settingsModal" class="hidden fixed inset-0 bg-slate-900/30 backdrop-blur-md z-[100] flex items-center justify-center">
-        <div class="bg-white/90 p-6 rounded-2xl border border-white w-full max-w-md shadow-2xl relative">
-            <h2 class="text-lg font-bold text-slate-800 mb-4">⚙️ 設定 API 能源金鑰</h2>
-            <p class="text-sm text-slate-500 mb-4">系統需綁定 Gemini API 以驅動宗師會診。金鑰僅加密儲存於本機瀏覽器。</p>
-            <input type="password" id="apiKeyInput" placeholder="輸入金鑰..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-slate-800 focus:outline-none focus:border-amber-500 mb-6">
-            <div class="flex justify-end gap-3">
-                <button onclick="toggleSettings()" class="px-4 py-2 rounded-xl text-slate-500 hover:bg-slate-100 transition font-medium">取消</button>
-                <button onclick="saveApiKey()" class="px-4 py-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 rounded-xl text-white font-bold transition shadow-lg shadow-amber-500/30">鎖定並儲存</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- 左側：記憶宮殿側邊欄 -->
-    <aside class="w-80 glass-panel flex flex-col border-r border-white/60 z-10 relative">
-        <div class="p-6 border-b border-white/60 flex justify-between items-center">
-            <h1 class="text-lg font-semibold text-slate-800 tracking-wide flex items-center gap-2">
-                <span class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-pulse shadow-[0_0_8px_rgba(245,158,11,0.8)]"></span>
-                Memory Palace
-            </h1>
-            <div class="flex gap-2">
-                <button onclick="clearHistoryCache()" class="text-slate-400 hover:text-red-500 transition" title="清除異常紀錄">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
-                </button>
-                <button onclick="toggleSettings()" class="text-slate-400 hover:text-amber-500 transition" title="API 設定">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
-                </button>
-            </div>
-        </div>
-        <div id="history-container" class="flex-1 overflow-y-auto p-4 space-y-3">
-            <!-- 歷史紀錄動態載入 -->
-        </div>
-    </aside>
-
-    <!-- 主工作區 -->
-    <main class="flex-1 flex flex-col md:flex-row h-full relative z-10">
-        
-        <!-- 全域載入遮罩 -->
-        <div id="loadingOverlay" class="hidden absolute inset-0 z-40 bg-white/70 backdrop-blur-md flex-col items-center justify-center">
-            <div class="loader ease-linear rounded-full border-4 border-t-4 border-amber-200 h-14 w-14 mb-4"></div>
-            <p class="text-amber-600 font-bold tracking-wide animate-pulse" id="loadingText">與零一神經網路同步中...</p>
-        </div>
-
-        <!-- 創作與會診區 (中欄) -->
-        <section class="flex-1 flex flex-col p-8 border-r border-white/60 relative">
-            <div id="state-input" class="flex-1 flex flex-col h-full">
-                <div class="mb-6">
-                    <h2 class="text-2xl font-bold text-slate-800 mb-2">💡 提示詞鑄造區</h2>
-                    <p class="text-sm text-slate-500 font-medium">寫下您的原始需求，我們將為您轉譯為機器最易懂的語言。</p>
+    <!-- ============================================== -->
+    <!-- 頂部導覽列 (Top Navigation Header) -->
+    <!-- ============================================== -->
+    <header class="h-16 px-6 glass-panel border-b border-white/70 dark:border-white/10 flex items-center justify-between z-30 shrink-0">
+        <div class="flex items-center gap-3">
+            <button onclick="toggleSidebar()" class="lg:hidden p-2 rounded-xl text-slate-500 dark:text-stone-400 hover:bg-amber-500/10 transition">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+            </button>
+            <div class="flex items-center gap-2.5">
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-500 via-orange-500 to-purple-600 flex items-center justify-center text-white shadow-lg shadow-amber-500/30">
+                    <span class="text-xl">🌌</span>
                 </div>
-                <div class="flex-1 relative glow-focus transition-all duration-300 rounded-2xl glass-panel flex flex-col shadow-sm">
-                    <textarea 
-                        id="ideaInput"
-                        class="w-full flex-1 bg-transparent p-6 text-slate-700 resize-none focus:outline-none text-base leading-relaxed placeholder-slate-400"
-                        placeholder="例如：我想結合太極系統的 20MA 跟 60MA 來寫一支選股條件..."
-                    ></textarea>
-                </div>
-                <div class="mt-6 flex justify-end">
-                    <button onclick="startConsultation()" class="px-8 py-3.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 rounded-xl text-white font-bold transition shadow-lg shadow-amber-500/30 flex items-center gap-2 transform hover:-translate-y-0.5">
-                        召喚智囊團會診
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-                    </button>
-                </div>
-            </div>
-
-            <!-- 狀態 2：宗師會診提問 -->
-            <div id="state-consult" class="hidden flex-1 flex flex-col h-full">
-                <div class="mb-6 flex justify-between items-center">
-                    <div>
-                        <h2 class="text-2xl font-bold text-slate-800 mb-2">⚔️ 宗師會診中</h2>
+                <div>
+                    <div class="flex items-center gap-2">
+                        <h1 class="text-base font-extrabold tracking-tight gradient-text">萬相星域 · Prompt Wizard</h1>
+                        <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30">全知中介樞紐</span>
                     </div>
-                    <button onclick="resetToInput()" class="text-sm text-slate-400 hover:text-amber-500 transition font-medium bg-white/50 px-3 py-1.5 rounded-lg border border-white/60 shadow-sm">取消重來</button>
+                    <p class="text-[11px] text-slate-500 dark:text-stone-400 hidden sm:block">百科圖書館藏 · 全域學術與前沿檢索 · 跨界宗師動態進駐 · 時代典範轉移校準</p>
                 </div>
-                <div class="flex-1 overflow-y-auto pr-2 custom-scrollbar">
-                    <div id="questionsContainer" class="space-y-6"></div>
+            </div>
+        </div>
+
+        <!-- 頂部中央：典範轉移羅盤與即時連線雷達 -->
+        <div class="hidden md:flex items-center gap-2.5">
+            <button onclick="openPresetsModal()" class="px-3 py-1.5 rounded-xl text-xs font-semibold text-amber-800 dark:text-amber-300 bg-amber-100/60 dark:bg-amber-900/40 hover:bg-amber-200/70 border border-amber-300/50 dark:border-amber-700/50 transition flex items-center gap-1.5 shadow-sm">
+                <span>🧭 時代典範探索羅盤</span>
+                <span class="text-[10px] bg-amber-500 text-white px-1.5 py-0.2 rounded-md font-bold">5+</span>
+            </button>
+
+            <!-- 實時聯網搜尋指示燈 -->
+            <button onclick="toggleSearchGrounding()" id="searchGroundingBtn" class="px-2.5 py-1.5 rounded-xl text-xs font-medium border transition flex items-center gap-1.5 border-emerald-400/50 bg-emerald-50/70 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 shadow-sm" title="點擊切換是否實時聯網檢索當前最新前沿學術與科技情資 (動態隨時間演進，非固定年份)">
+                <span class="relative flex h-2 w-2">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                </span>
+                <span id="searchGroundingStatusText">🌐 全時學術前沿檢索中</span>
+            </button>
+
+            <span class="h-4 w-px bg-slate-300 dark:bg-stone-700"></span>
+
+            <!-- 模型連線雷達 -->
+            <div id="connectionStatusBadge" class="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-amber-50 dark:bg-amber-950/50 text-amber-700 dark:text-amber-300 border border-amber-300/40 cursor-pointer" onclick="toggleSettings()" title="點擊檢視 API 與動態模型庫">
+                <span class="w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+                <span id="connectionStatusText">動態探測中...</span>
+            </div>
+
+            <!-- 系統自我演進檢視儀 (Evolution Sentinel) -->
+            <button onclick="openSystemInspectionModal()" id="systemEvolutionBadge" class="px-2.5 py-1.5 rounded-xl text-xs font-semibold border transition flex items-center gap-1.5 border-blue-400/40 bg-blue-50/70 dark:bg-blue-950/40 text-blue-700 dark:text-blue-300 shadow-sm hover:scale-105" title="點擊檢視系統自我演進檢核報告與更新建議">
+                <span class="relative flex h-2 w-2">
+                    <span id="sentinelPing" class="animate-ping absolute inline-flex h-full w-full rounded-full bg-blue-400 opacity-75"></span>
+                    <span id="sentinelDot" class="relative inline-flex rounded-full h-2 w-2 bg-blue-500"></span>
+                </span>
+                <span id="systemEvolutionText">🩺 演進自檢中...</span>
+            </button>
+        </div>
+
+        <!-- 頂部右側功能鍵 -->
+        <div class="flex items-center gap-2.5">
+            <!-- 萬相圖書館開關 (桌面) -->
+            <button onclick="toggleSidebar()" class="p-2 rounded-xl text-slate-600 dark:text-stone-300 hover:bg-amber-500/15 transition relative" title="萬相圖書館 (分類館藏與歷史法典)">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                <span id="navHistoryBadgeCount" class="absolute -top-1 -right-1 w-4 h-4 bg-amber-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">0</span>
+            </button>
+
+            <!-- 深色 / 淺色模式切換 -->
+            <button onclick="toggleDarkMode()" class="p-2 rounded-xl text-slate-600 dark:text-stone-300 hover:bg-amber-500/15 transition" title="切換深淺模式">
+                <svg id="themeIconSun" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path></svg>
+                <svg id="themeIconMoon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+            </button>
+
+            <!-- API / 系統設定 -->
+            <button onclick="toggleSettings()" class="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white font-semibold text-xs transition shadow-md shadow-amber-500/25 flex items-center gap-1.5" title="設定 API Key、動態探測模型與連線架構">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                <span>能源設定</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- ============================================== -->
+    <!-- 主要工作雙欄區域 (Main Body) -->
+    <!-- ============================================== -->
+    <div class="flex-1 flex overflow-hidden relative">
+
+        <!-- ========================================== -->
+        <!-- 左側：萬相圖書館典藏側邊抽屜 (Omniverse Library Sidebar) -->
+        <!-- ========================================== -->
+        <aside id="sidebar" class="w-80 glass-panel border-r border-white/70 dark:border-white/10 flex flex-col z-20 transition-all duration-300 -ml-80 lg:ml-0 absolute lg:relative h-full shrink-0 shadow-xl lg:shadow-none">
+            <div class="p-3.5 border-b border-white/70 dark:border-white/10 flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <span class="text-base">🏛️</span>
+                    <div>
+                        <h2 class="text-xs font-bold text-slate-800 dark:text-stone-100 flex items-center gap-1.5">
+                            <span>萬相圖書館</span>
+                            <span id="historyBadgeCount" class="text-[10px] bg-amber-500/20 text-amber-700 dark:text-amber-300 px-1.5 py-0.2 rounded-full font-bold">0</span>
+                        </h2>
+                        <div class="text-[10px] text-slate-400">宗師法典與歷次提問分類館藏</div>
+                    </div>
                 </div>
-                <div class="mt-6 flex justify-end">
-                    <button onclick="forgeUltimatePrompt()" class="px-8 py-3.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 rounded-xl text-white font-bold transition shadow-lg shadow-emerald-500/30 flex items-center gap-2 transform hover:-translate-y-0.5">
-                        ✨ 鍛造終極詠唱
+                <div class="flex items-center gap-0.5">
+                    <input type="file" id="importHistoryFileInput" accept=".json" class="hidden" onchange="handleImportHistoryFile(event)">
+                    <button onclick="document.getElementById('importHistoryFileInput').click()" class="p-1.5 text-slate-400 hover:text-emerald-500 transition rounded-lg" title="📥 匯入圖書館藏書 JSON 檔案">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg>
+                    </button>
+                    <button onclick="exportHistoryJSON()" class="p-1.5 text-slate-400 hover:text-amber-500 transition rounded-lg" title="📤 匯出圖書館藏書 JSON 備份">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                    </button>
+                    <button onclick="clearHistoryCache()" class="p-1.5 text-slate-400 hover:text-rose-500 transition rounded-lg" title="🗑️ 清空所有紀錄">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                    </button>
+                    <button onclick="toggleSidebar()" class="lg:hidden p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-stone-200">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                     </button>
                 </div>
             </div>
-        </section>
 
-        <!-- 終極詠唱輸出區 (右欄) -->
-        <section class="flex-1 flex flex-col p-8 bg-white/30 backdrop-blur-sm relative">
-            <div class="mb-6 flex justify-between items-end">
-                <h2 class="text-2xl font-bold text-slate-800 mb-1">Final Prompt</h2>
-                <button id="copy-btn" onclick="copyToClipboard()" class="group relative px-5 py-2.5 font-bold text-slate-700 bg-white rounded-xl transition hover:bg-slate-50 flex items-center gap-2 overflow-hidden border border-slate-200 shadow-sm hover:shadow-md">
-                    <span id="copy-text" class="relative z-10 flex items-center gap-2">
-                        <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
-                        一鍵複製
-                    </span>
+            <!-- 圖書館書架分類切換列 (Library Category Shelves) -->
+            <div class="px-3 pt-2.5 pb-1 border-b border-white/40 dark:border-white/5">
+                <div class="flex items-center gap-1 overflow-x-auto pb-1.5 scrollbar-none text-[11px]" id="libraryCategoryPills">
+                    <!-- 動態由 JavaScript 生成各分類書架藥丸標籤 -->
+                </div>
+            </div>
+
+            <!-- 歷史紀錄搜尋列 -->
+            <div class="p-2.5 border-b border-white/50 dark:border-white/5">
+                <div class="relative">
+                    <input type="text" id="historySearchInput" oninput="filterHistory()" placeholder="搜尋圖書館藏書或階梯法典..." class="w-full bg-white/70 dark:bg-stone-800/80 border border-slate-200 dark:border-stone-700 rounded-xl px-3 py-1.5 pl-8 text-xs text-slate-700 dark:text-stone-200 focus:outline-none focus:border-amber-500">
+                    <svg class="w-3.5 h-3.5 text-slate-400 absolute left-2.5 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                </div>
+            </div>
+
+            <!-- 歷史清單容器 -->
+            <div id="history-container" class="flex-1 overflow-y-auto p-3 space-y-2.5">
+                <!-- 動態載入歷史紀錄卡片 -->
+            </div>
+        </aside>
+
+        <!-- ========================================== -->
+        <!-- 中間工作區：萬相需求鑄造與中介轉譯區 -->
+        <!-- ========================================== -->
+        <main class="flex-1 flex flex-col p-4 md:p-6 overflow-y-auto lg:overflow-hidden relative z-10">
+            <div class="h-full flex flex-col lg:flex-row gap-5">
+
+                <!-- 鍛造工作台 (左半/中欄) -->
+                <section class="flex-1 flex flex-col h-full glass-panel rounded-2xl p-5 md:p-6 overflow-y-auto relative">
+                    
+                    <!-- 記憶階梯提示條 (若處於階梯迭代模式) -->
+                    <div id="ladderModeBanner" class="hidden mb-3 p-3 rounded-xl bg-amber-500/10 dark:bg-amber-500/15 border border-amber-500/30 flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <span class="text-base">🪜</span>
+                            <div>
+                                <div class="text-xs font-bold text-amber-700 dark:text-amber-300">
+                                    當前處於【記憶階梯·深化模式】(目標：第 <span id="currentLadderTargetLevel">2</span> 階)
+                                </div>
+                                <div class="text-[11px] text-slate-500 dark:text-stone-400" id="ladderParentTitle">
+                                    將以上一階成果為基石進行定向強化
+                                </div>
+                            </div>
+                        </div>
+                        <button onclick="exitLadderMode()" class="text-xs text-slate-400 hover:text-rose-500 p-1 font-medium" title="退出階梯模式，回到獨立鍛造">
+                            退出階梯
+                        </button>
+                    </div>
+
+                    <!-- 標題與引導 -->
+                    <div class="mb-3 flex items-center justify-between">
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <h2 class="text-lg font-bold text-slate-800 dark:text-stone-100 flex items-center gap-2">
+                                    <span>💡 萬相需求輸入與跨界意圖解析區</span>
+                                </h2>
+                            </div>
+                            <p class="text-xs text-slate-500 dark:text-stone-400 mt-0.5">無論何種領域，系統將作為全知中介，搜尋學術文獻與時代典範，召喚相應宗師淬煉為 AI 終極指令</p>
+                        </div>
+                        <button onclick="clearCurrentInput()" class="text-xs text-slate-400 hover:text-amber-500 transition flex items-center gap-1" title="清空重填">
+                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                            <span>重置</span>
+                        </button>
+                    </div>
+
+                    <!-- 主要輸入框 (支援文字 + Ctrl+V 貼上圖片) -->
+                    <div class="relative flex-1 min-h-[140px] md:min-h-[160px] rounded-xl bg-white/70 dark:bg-stone-900/60 border border-slate-200/80 dark:border-stone-700/80 glow-focus transition-all duration-300 flex flex-col mb-3">
+                        <textarea 
+                            id="ideaInput"
+                            class="w-full flex-1 bg-transparent p-4 text-slate-800 dark:text-stone-100 resize-none focus:outline-none text-sm leading-relaxed placeholder-slate-400 dark:placeholder-stone-500"
+                            placeholder="【在此提出您的任何學術、技術、商業或哲學構想】&#10;無論是「量子退相干演算法」、「CRISPR 非靶向切割抑制」、「星際航行軌道推進」、「去中心化拜占庭容錯博弈」，或是「結合太極雙均線過濾假突破」...&#10;&#10;系統將立即檢索最新學術前沿，召喚人類知識庫中最對應的古今宗師進駐，為您解構並轉譯為機器能完美執行的 Prompt！&#10;💡 小提示：您可以直接按下 Ctrl + V 貼上螢幕截圖，或拖曳代碼/架構圖檔案到此！"
+                        ></textarea>
+
+                        <!-- 多模態附件預覽列 (Thumbnails Strip) -->
+                        <div id="attachmentsContainer" class="hidden px-4 pb-3 pt-1 flex flex-wrap gap-2 border-t border-slate-100 dark:border-stone-800/80">
+                            <!-- 動態插入附件標籤 -->
+                        </div>
+                    </div>
+
+                    <!-- 多模態上傳與夾帶快捷工具列 -->
+                    <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+                        <div class="flex items-center gap-2">
+                            <label class="cursor-pointer px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-stone-800 hover:bg-amber-100 dark:hover:bg-amber-900/30 text-slate-700 dark:text-stone-300 text-xs font-medium border border-slate-200 dark:border-stone-700 transition flex items-center gap-1.5">
+                                <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                                <span>夾帶截圖 / 圖表</span>
+                                <input type="file" id="imageFileInput" accept="image/*" multiple class="hidden" onchange="handleFileSelect(event)">
+                            </label>
+
+                            <label class="cursor-pointer px-3 py-1.5 rounded-xl bg-slate-100 dark:bg-stone-800 hover:bg-amber-100 dark:hover:bg-amber-900/30 text-slate-700 dark:text-stone-300 text-xs font-medium border border-slate-200 dark:border-stone-700 transition flex items-center gap-1.5">
+                                <svg class="w-4 h-4 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                                <span>學術論文 / 代碼文檔 (TXT, MD, CSV, PDF)</span>
+                                <input type="file" id="docFileInput" accept=".txt,.md,.json,.csv,.py,.js,.ts,.html,.css,.sql,.pdf" multiple class="hidden" onchange="handleFileSelect(event)">
+                            </label>
+                        </div>
+                        <span class="text-[11px] text-slate-400 dark:text-stone-500 hidden sm:inline">支援拖曳檔案或剪貼簿貼上 (Ctrl+V)</span>
+                    </div>
+
+                    <!-- ============================================== -->
+                    <!-- 萬相星域全知宗師召喚網絡 (Universal Grandmaster Ingress) -->
+                    <!-- ============================================== -->
+                    <div class="space-y-3 bg-slate-50/70 dark:bg-stone-900/40 rounded-xl p-3.5 border border-slate-200/60 dark:border-stone-800">
+                        
+                        <!-- 1. 萬相星域全知宗師召喚 -->
+                        <div>
+                            <div class="flex items-center justify-between mb-1.5">
+                                <label class="text-xs font-bold text-slate-700 dark:text-stone-300 flex items-center gap-1.5">
+                                    <span>🌌 星域宗師進駐模式 (Universal Grandmasters Ingress)</span>
+                                </label>
+                                <span class="text-[10px] text-amber-600 dark:text-amber-400">百科全書式全域匹配 · 無界限召喚</span>
+                            </div>
+
+                            <!-- 自訂宗師/學派/領域開放輸入框 -->
+                            <div class="mb-2">
+                                <input 
+                                    type="text" 
+                                    id="customMastersInput" 
+                                    placeholder="🔍 指定進駐宗師/學派 (例如：中本聰、珍·古德、彭羅斯、納許、愛因斯坦、現代量子前沿學派... 留空則全自動智能調度)" 
+                                    class="w-full bg-white dark:bg-stone-800 border border-slate-200 dark:border-stone-700 rounded-lg px-3 py-1.5 text-xs text-slate-700 dark:text-stone-200 focus:outline-none focus:border-amber-500"
+                                >
+                            </div>
+                            
+                            <!-- 跨學科星域快速探測錨點 -->
+                            <div class="flex flex-wrap gap-1.5" id="mastersChipsContainer">
+                                <button type="button" onclick="quickInsertMaster('🌌 全自動星域神諭 (動態調度最契合權威)')" class="chip-selectable active text-xs px-2.5 py-0.5 rounded-lg bg-amber-500 text-white font-medium">🌌 全自動星域神諭 (推薦)</button>
+                                <button type="button" onclick="quickInsertMaster('🚀 航太與天文宇宙學 (齊奧爾科夫斯基 / 馮·布朗 / 卡爾·薩根)')" class="chip-selectable text-xs px-2 py-0.5 rounded-lg bg-white dark:bg-stone-800 border border-slate-200 dark:border-stone-700 text-slate-700 dark:text-stone-300 hover:border-amber-400">🚀 航太與深空推進</button>
+                                <button type="button" onclick="quickInsertMaster('🧬 合成生物與現代遺傳 (珍妮佛·杜德納 / 薛丁格 / 達爾文)')" class="chip-selectable text-xs px-2 py-0.5 rounded-lg bg-white dark:bg-stone-800 border border-slate-200 dark:border-stone-700 text-slate-700 dark:text-stone-300 hover:border-amber-400">🧬 基因編輯與合成生物</button>
+                                <button type="button" onclick="quickInsertMaster('💻 量子運算與前沿架構 (理查·費曼 / 艾倫·圖靈 / 馮·紐曼)')" class="chip-selectable text-xs px-2 py-0.5 rounded-lg bg-white dark:bg-stone-800 border border-slate-200 dark:border-stone-700 text-slate-700 dark:text-stone-300 hover:border-amber-400">💻 量子計算與極限架構</button>
+                                <button type="button" onclick="quickInsertMaster('📈 複雜適應系統與量化博弈 (約翰·納許 / 吉姆·西蒙斯 / 查理·蒙格)')" class="chip-selectable text-xs px-2 py-0.5 rounded-lg bg-white dark:bg-stone-800 border border-slate-200 dark:border-stone-700 text-slate-700 dark:text-stone-300 hover:border-amber-400">📈 非對稱博弈與量化經濟</button>
+                                <button type="button" onclick="quickInsertMaster('🧠 認知神經學與自由能原理 (卡爾·弗里斯頓 / 丹尼爾·卡尼曼 / 諾曼)')" class="chip-selectable text-xs px-2 py-0.5 rounded-lg bg-white dark:bg-stone-800 border border-slate-200 dark:border-stone-700 text-slate-700 dark:text-stone-300 hover:border-amber-400">🧠 認知神經與心智哲學</button>
+                                <button type="button" onclick="quickInsertMaster('⚔️ 地緣戰略與博弈論 (孫子 / 克勞塞維茨 / 謝林)')" class="chip-selectable text-xs px-2 py-0.5 rounded-lg bg-white dark:bg-stone-800 border border-slate-200 dark:border-stone-700 text-slate-700 dark:text-stone-300 hover:border-amber-400">⚔️ 全域戰略與非對稱博弈</button>
+                                <button type="button" onclick="quickInsertMaster('🎨 跨領域整合與文藝復興工程 (李奧納多·達文西 / 亞里斯多德)')" class="chip-selectable text-xs px-2 py-0.5 rounded-lg bg-white dark:bg-stone-800 border border-slate-200 dark:border-stone-700 text-slate-700 dark:text-stone-300 hover:border-amber-400">🎨 文藝復興跨域通才</button>
+                            </div>
+                        </div>
+
+                        <!-- 2. 資安等級 + 目標 AI 雙選 -->
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1 border-t border-slate-200/50 dark:border-stone-800">
+                            <!-- 資安防護 -->
+                            <div>
+                                <label class="text-xs font-bold text-slate-700 dark:text-stone-300 flex items-center gap-1 mb-1">
+                                    <span>🛡️ 資安防禦等級</span>
+                                </label>
+                                <select id="securityLevelSelect" class="w-full bg-white dark:bg-stone-800 border border-slate-200 dark:border-stone-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-700 dark:text-stone-200 focus:outline-none focus:border-amber-500">
+                                    <option value="fortress">🏰 堡壘級防禦 (防Prompt注入 / 標籤隔離 / 防逆向工程 / PII脫敏)</option>
+                                    <option value="standard">🛡️ 標準商用級 (角色鎖定 / 邊界控制 / 隱私規範)</option>
+                                </select>
+                            </div>
+
+                            <!-- 目標 AI 最佳化 -->
+                            <div>
+                                <label class="text-xs font-bold text-slate-700 dark:text-stone-300 flex items-center gap-1 mb-1">
+                                    <span>🎯 目標 AI 格式最佳化</span>
+                                </label>
+                                <select id="targetModelSelect" class="w-full bg-white dark:bg-stone-800 border border-slate-200 dark:border-stone-700 rounded-lg px-2.5 py-1.5 text-xs text-slate-700 dark:text-stone-200 focus:outline-none focus:border-amber-500">
+                                    <option value="universal">🌐 通用大模型 (Universal LLM)</option>
+                                    <option value="claude">🟣 Anthropic Claude 3.7 / 3.5 (XML 標籤架構)</option>
+                                    <option value="chatgpt">🟢 OpenAI ChatGPT 4o / o3 (嚴謹區隔 Markdown)</option>
+                                    <option value="gemini">🔵 Google Gemini 3.5 / 2.5 (多模態寬脈絡)</option>
+                                    <option value="cursor">💻 Cursor / GitHub Copilot (代碼工程 System Rule)</option>
+                                    <option value="deepseek">🐋 DeepSeek V3 / R1 (思維推理鏈強化)</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 鍛造觸發大按鈕 -->
+                    <div class="mt-3 pt-1">
+                        <button onclick="startForgingProcess()" id="forgeBtn" class="w-full py-3.5 px-6 rounded-xl bg-gradient-to-r from-amber-500 via-orange-500 to-purple-600 hover:from-amber-400 hover:to-orange-400 text-white font-bold text-sm tracking-wide transition-all duration-300 shadow-lg shadow-amber-500/30 flex items-center justify-center gap-2 transform hover:-translate-y-0.5 active:translate-y-0">
+                            <span class="text-base">🌌</span>
+                            <span id="forgeBtnText">啟動萬相中介 · 檢索前沿並鍛造終極法典</span>
+                            <span class="text-[11px] font-mono opacity-80 bg-white/20 px-2 py-0.5 rounded-md hidden sm:inline">Ctrl + Enter</span>
+                        </button>
+                    </div>
+                </section>
+
+                <!-- ========================================== -->
+                <!-- 終極法典成果區 (右半/輸出欄) -->
+                <!-- ========================================== -->
+                <section class="flex-1 flex flex-col h-full glass-panel rounded-2xl p-5 md:p-6 overflow-hidden relative">
+                    
+                    <!-- 記憶階梯進化導航條 (Memory Ladder Stepper) -->
+                    <div class="mb-3 bg-slate-100/90 dark:bg-stone-900/80 rounded-xl p-2.5 border border-slate-200 dark:border-stone-800 flex items-center justify-between">
+                        <div class="flex items-center gap-1.5 text-xs font-bold text-slate-700 dark:text-stone-300">
+                            <span>🪜 記憶階梯：</span>
+                        </div>
+                        <div class="flex items-center gap-1 sm:gap-2 flex-1 justify-center max-w-md">
+                            <div id="ladderStepNode1" class="ladder-step-node px-2.5 py-1 rounded-lg text-[11px] font-bold bg-amber-500 text-white shadow-sm flex items-center gap-1">
+                                <span>1</span><span class="hidden sm:inline">雛形草創</span>
+                            </div>
+                            <span class="text-slate-300 dark:text-stone-600 text-xs">➔</span>
+                            <div id="ladderStepNode2" class="ladder-step-node px-2.5 py-1 rounded-lg text-[11px] font-medium bg-white dark:bg-stone-800 text-slate-500 dark:text-stone-400 border border-slate-200 dark:border-stone-700 flex items-center gap-1">
+                                <span>2</span><span class="hidden sm:inline">宗師對搞</span>
+                            </div>
+                            <span class="text-slate-300 dark:text-stone-600 text-xs">➔</span>
+                            <div id="ladderStepNode3" class="ladder-step-node px-2.5 py-1 rounded-lg text-[11px] font-medium bg-white dark:bg-stone-800 text-slate-500 dark:text-stone-400 border border-slate-200 dark:border-stone-700 flex items-center gap-1">
+                                <span>3</span><span class="hidden sm:inline">實戰淬鍊</span>
+                            </div>
+                            <span class="text-slate-300 dark:text-stone-600 text-xs">➔</span>
+                            <div id="ladderStepNode4" class="ladder-step-node px-2.5 py-1 rounded-lg text-[11px] font-medium bg-white dark:bg-stone-800 text-slate-500 dark:text-stone-400 border border-slate-200 dark:border-stone-700 flex items-center gap-1">
+                                <span>4</span><span class="hidden sm:inline">終極法典</span>
+                            </div>
+                        </div>
+                        <button onclick="openLadderClimbModal()" id="ascendLadderBtn" class="text-xs font-bold text-amber-700 dark:text-amber-300 bg-amber-500/15 hover:bg-amber-500/25 px-2.5 py-1 rounded-lg border border-amber-500/30 transition flex items-center gap-1" title="基於當前法典，向上攀登下一階梯進行深度微調">
+                            <span>🧗 深化下一階</span>
+                        </button>
+                    </div>
+
+                    <!-- 頂部視圖切換與動作列 -->
+                    <div class="mb-3 flex flex-wrap items-center justify-between gap-2 border-b border-slate-200/70 dark:border-stone-800 pb-2.5">
+                        <!-- 頁籤切換 -->
+                        <div class="flex items-center gap-1 bg-slate-100/80 dark:bg-stone-900/60 p-1 rounded-xl border border-slate-200 dark:border-stone-700">
+                            <button onclick="switchViewTab('trinity')" id="tab-trinity" class="px-3 py-1 rounded-lg text-xs font-bold transition text-white bg-amber-500 shadow-sm">
+                                🏛️ 萬相全景儀表板
+                            </button>
+                            <button onclick="switchViewTab('prompt-only')" id="tab-prompt-only" class="px-3 py-1 rounded-lg text-xs font-medium transition text-slate-600 dark:text-stone-400 hover:text-amber-500">
+                                📜 終極機讀 System Prompt
+                            </button>
+                            <button onclick="switchViewTab('raw')" id="tab-raw" class="px-3 py-1 rounded-lg text-xs font-medium transition text-slate-600 dark:text-stone-400 hover:text-amber-500">
+                                📝 原始 Markdown
+                            </button>
+                        </div>
+
+                        <!-- 快捷功能按鈕組 -->
+                        <div class="flex items-center gap-2">
+                            <button onclick="copyUltimatePrompt()" id="copyPromptBtn" class="px-3 py-1.5 rounded-xl bg-white dark:bg-stone-800 border border-slate-200 dark:border-stone-700 hover:border-amber-400 text-slate-700 dark:text-stone-200 text-xs font-bold transition flex items-center gap-1.5 shadow-sm hover:shadow" title="直接複製終極 System Prompt">
+                                <svg class="w-3.5 h-3.5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                                <span>一鍵複製 Prompt</span>
+                            </button>
+                            <button onclick="downloadAsMarkdown()" class="p-1.5 rounded-xl bg-white dark:bg-stone-800 border border-slate-200 dark:border-stone-700 hover:border-amber-400 text-slate-600 dark:text-stone-300 transition shadow-sm" title="下載 .md 報告檔案">
+                                <svg class="w-4 h-4 text-slate-500 dark:text-stone-400 hover:text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 內容展示容器 -->
+                    <div class="flex-1 overflow-y-auto relative rounded-xl pr-1">
+                        
+                        <!-- 狀態 1：空白導引 (Empty State) -->
+                        <div id="outputEmptyState" class="h-full flex flex-col items-center justify-center text-center p-8 text-slate-400 dark:text-stone-500">
+                            <div class="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-500 mb-4 text-3xl">
+                                🌌
+                            </div>
+                            <h3 class="text-base font-bold text-slate-700 dark:text-stone-300 mb-1">萬相全知中介樞紐靜候中</h3>
+                            <p class="text-xs max-w-sm text-slate-500 dark:text-stone-400 leading-relaxed mb-4">輸入任何維度的需求，系統將如全宇宙百科全書般全時檢索學術文獻與時代演進（如地平至地圓、陸運至星際），動態進駐對應宗師淬煉為 AI 終極指令。</p>
+                            <button onclick="openPresetsModal()" class="px-4 py-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-700 dark:text-amber-300 text-xs font-semibold border border-amber-500/30 transition">
+                                探索時代典範演進羅盤
+                            </button>
+                        </div>
+
+                        <!-- 狀態 2：動態加載神經網路動畫 (Loading Overlay) -->
+                        <div id="outputLoadingState" class="hidden h-full flex flex-col items-center justify-center p-8 text-center">
+                            <div class="w-16 h-16 rounded-full border-4 border-amber-200 dark:border-stone-800 loader-ring mb-4"></div>
+                            <h4 id="loadingStepTitle" class="text-sm font-bold text-amber-600 dark:text-amber-400 tracking-wide animate-pulse mb-1">正在多模態解析意圖與學術前沿...</h4>
+                            <p id="loadingStepSubtitle" class="text-xs text-slate-400 dark:text-stone-500">正在全網檢索最新理論與時代典範，召喚相關跨界宗師進行辯論與機器轉譯</p>
+                        </div>
+
+                        <!-- 狀態 3A：三階全景儀表板 (Trinity View) -->
+                        <div id="viewTrinity" class="hidden space-y-5 pb-6">
+                            
+                            <!-- 實時聯網動態情資卡片 (Google Search Grounding Intel) -->
+                            <div id="groundingIntelCard" class="hidden bg-gradient-to-br from-emerald-500/10 via-teal-500/5 to-transparent rounded-2xl p-4 border border-emerald-500/30 shadow-sm">
+                                <div class="flex items-center justify-between mb-2">
+                                    <div class="flex items-center gap-2">
+                                        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                                        <h4 class="text-xs font-bold text-emerald-800 dark:text-emerald-300 flex items-center gap-1.5">
+                                            <span>🌐 實時前沿學術與科技情資 (Live Grounding Sources)</span>
+                                        </h4>
+                                    </div>
+                                    <span id="groundingTimestampBadge" class="text-[10px] bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 px-2 py-0.5 rounded-full font-bold">🌐 全時實時動態校驗</span>
+                                </div>
+                                <div id="groundingQueriesContainer" class="flex flex-wrap gap-1.5 mb-2">
+                                    <!-- 動態插入搜尋關鍵字標籤 -->
+                                </div>
+                                <div id="groundingSourcesContainer" class="text-[11px] text-slate-600 dark:text-stone-300 space-y-1">
+                                    <!-- 動態插入來源參考引用 -->
+                                </div>
+                            </div>
+
+                            <!-- 第一階段卡片：宗師辯論與核心盲點 -->
+                            <div class="bg-gradient-to-br from-amber-500/5 via-orange-500/5 to-transparent rounded-2xl p-5 border border-amber-500/20 shadow-sm">
+                                <div class="flex items-center gap-2 mb-3">
+                                    <span class="px-2 py-0.5 rounded-md bg-amber-500 text-white text-[11px] font-bold">第一階段</span>
+                                    <h3 class="text-sm font-bold text-slate-800 dark:text-stone-100 flex items-center gap-1.5">
+                                        <span>⚔️ 萬相宗師進駐對談與時代典範轉移紀錄</span>
+                                    </h3>
+                                </div>
+                                <div id="stage1Content" class="markdown-content text-xs text-slate-700 dark:text-stone-300 space-y-3">
+                                    <!-- 動態填入第一階段內容 -->
+                                </div>
+                            </div>
+
+                            <!-- 第二階段卡片：給使用者的提示詞完善建議 -->
+                            <div class="bg-gradient-to-br from-teal-500/5 via-emerald-500/5 to-transparent rounded-2xl p-5 border border-teal-500/20 shadow-sm">
+                                <div class="flex items-center gap-2 mb-3">
+                                    <span class="px-2 py-0.5 rounded-md bg-teal-600 text-white text-[11px] font-bold">第二階段</span>
+                                    <h3 class="text-sm font-bold text-slate-800 dark:text-stone-100 flex items-center gap-1.5">
+                                        <span>🧭 宗師跨界認知完善建議與邊界微調</span>
+                                    </h3>
+                                </div>
+                                <div id="stage2Content" class="markdown-content text-xs text-slate-700 dark:text-stone-300 space-y-3">
+                                    <!-- 動態填入第二階段內容 -->
+                                </div>
+                            </div>
+
+                            <!-- 第三階段卡片：終極 System Prompt -->
+                            <div class="bg-gradient-to-br from-indigo-500/5 via-amber-500/5 to-transparent rounded-2xl p-5 border border-amber-500/30 shadow-md">
+                                <div class="flex items-center justify-between mb-3">
+                                    <div class="flex items-center gap-2">
+                                        <span class="px-2 py-0.5 rounded-md bg-gradient-to-r from-amber-500 to-orange-500 text-white text-[11px] font-bold">第三階段</span>
+                                        <h3 class="text-sm font-bold text-slate-800 dark:text-stone-100 flex items-center gap-1.5">
+                                            <span>📜 終極機讀 System Prompt (機器零歧義解構執行版)</span>
+                                        </h3>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <button onclick="openLadderClimbModal()" class="px-2.5 py-1 rounded-lg bg-amber-500/15 hover:bg-amber-500/25 text-amber-700 dark:text-amber-300 text-xs font-bold transition flex items-center gap-1 border border-amber-500/30 shadow-sm">
+                                            <span>🪜 深化本法典</span>
+                                        </button>
+                                        <button onclick="copyUltimatePrompt()" class="px-2.5 py-1 rounded-lg bg-amber-500 hover:bg-amber-400 text-white text-xs font-bold transition flex items-center gap-1 shadow-sm">
+                                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                                            <span>快速複製</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="relative bg-slate-900 rounded-xl p-4 border border-slate-800 text-slate-100 font-mono text-xs leading-relaxed overflow-x-auto selection:bg-amber-500/40">
+                                    <pre id="stage3CodeBlock" class="whitespace-pre-wrap font-mono"></pre>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- 狀態 3B：純淨 System Prompt 專用視圖 -->
+                        <div id="viewPromptOnly" class="hidden h-full flex flex-col">
+                            <div class="flex items-center justify-between bg-slate-800 text-slate-200 px-4 py-2.5 rounded-t-xl text-xs font-mono">
+                                <div class="flex items-center gap-2">
+                                    <span class="w-2.5 h-2.5 rounded-full bg-red-500"></span>
+                                    <span class="w-2.5 h-2.5 rounded-full bg-yellow-500"></span>
+                                    <span class="w-2.5 h-2.5 rounded-full bg-green-500"></span>
+                                    <span class="ml-2 text-slate-400 font-sans">終極詠唱法典 (System Prompt)</span>
+                                </div>
+                                <div class="flex items-center gap-3">
+                                    <span id="promptStatsToken" class="text-[11px] text-amber-400 font-mono">約 0 字</span>
+                                    <button onclick="copyUltimatePrompt()" class="px-2.5 py-1 rounded bg-amber-500 hover:bg-amber-400 text-white font-sans font-bold text-xs transition">
+                                        複製此 Prompt
+                                    </button>
+                                </div>
+                            </div>
+                            <textarea id="promptOnlyTextarea" readonly class="w-full flex-1 bg-slate-950 text-slate-100 p-4 font-mono text-xs leading-relaxed resize-none rounded-b-xl focus:outline-none border border-slate-800 selection:bg-amber-500/40"></textarea>
+                        </div>
+
+                        <!-- 狀態 3C：原始 Markdown 視圖 -->
+                        <div id="viewRawMarkdown" class="hidden markdown-content text-xs text-slate-800 dark:text-stone-200 p-4 leading-relaxed">
+                            <!-- 動態填入 marked 解析後的完整 markdown -->
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- 彈出視窗 1：API 能源與動態模型探測 (Settings Modal) -->
+    <!-- ============================================== -->
+    <div id="settingsModal" class="hidden fixed inset-0 bg-slate-950/60 backdrop-blur-md z-50 flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-stone-900 border border-slate-200 dark:border-stone-700 w-full max-w-lg rounded-2xl shadow-2xl p-6 relative overflow-hidden">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-2.5">
+                    <div class="w-8 h-8 rounded-xl bg-amber-500/15 text-amber-600 dark:text-amber-400 flex items-center justify-center text-lg">⚙️</div>
+                    <div>
+                        <h3 class="text-base font-bold text-slate-800 dark:text-stone-100">核心引擎與模型動態探測</h3>
+                        <p class="text-[11px] text-slate-400">告別 404 舊端點迷思 · 即時同步 Google 官方有效模型庫</p>
+                    </div>
+                </div>
+                <button onclick="toggleSettings()" class="text-slate-400 hover:text-slate-600 dark:hover:text-stone-200 p-1">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                 </button>
             </div>
 
-            <div class="flex-1 glass-panel rounded-2xl p-6 overflow-y-auto relative shadow-sm">
-                <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center text-slate-400 pointer-events-none">
-                    <svg class="w-14 h-14 mb-4 opacity-30 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
-                    <p class="text-sm font-medium tracking-wide">等待智囊團鍛造，轉譯為 AI 專屬語言</p>
-                </div>
-                <pre id="preview-output" class="font-mono text-sm text-slate-700 whitespace-pre-wrap leading-relaxed hidden"></pre>
-            </div>
-        </section>
-    </main>
+            <!-- 連線模式切換標籤 -->
+            <div class="mb-4">
+                <label class="block text-xs font-bold text-slate-700 dark:text-stone-300 mb-2">📡 連線架構選擇</label>
+                <div class="grid grid-cols-2 gap-2">
+                    <button type="button" onclick="setConnectionMode('direct')" id="modeBtnDirect" class="p-3 rounded-xl border text-left transition flex flex-col gap-1 border-amber-500 bg-amber-50/50 dark:bg-amber-950/30">
+                        <span class="text-xs font-bold text-amber-700 dark:text-amber-300 flex items-center gap-1.5">
+                            <span>🌐 直連 Gemini API</span>
+                            <span class="text-[9px] bg-amber-500 text-white px-1 rounded">推薦</span>
+                        </span>
+                        <span class="text-[11px] text-slate-500 dark:text-stone-400">免後端伺服器，適用於 GitHub Pages 與純前端環境。</span>
+                    </button>
 
-    <!-- 微互動 Toast 提示 -->
-    <div id="toast" class="fixed bottom-8 right-8 px-6 py-3 bg-white text-slate-800 rounded-xl shadow-2xl border border-slate-100 transform translate-y-20 opacity-0 transition-all duration-300 flex items-center gap-3 z-50">
-        <div class="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]"></div>
-        <span class="text-sm font-bold">已複製至剪貼簿！</span>
+                    <button type="button" onclick="setConnectionMode('backend')" id="modeBtnBackend" class="p-3 rounded-xl border text-left transition flex flex-col gap-1 border-slate-200 dark:border-stone-700">
+                        <span class="text-xs font-bold text-slate-700 dark:text-stone-300 flex items-center gap-1.5">
+                            <span>🏰 本地後端要塞</span>
+                        </span>
+                        <span class="text-[11px] text-slate-500 dark:text-stone-400">連線至 Node.js Mastermind API (Port 8000)。</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- 模式 A：直連 Gemini API 設定區 -->
+            <div id="settingsDirectSection" class="space-y-3.5 mb-5">
+                <div>
+                    <div class="flex items-center justify-between mb-1.5">
+                        <label class="text-xs font-bold text-slate-700 dark:text-stone-300">Google Gemini API Key</label>
+                        <a href="https://aistudio.google.com/app/apikey" target="_blank" class="text-[11px] text-amber-600 dark:text-amber-400 hover:underline flex items-center gap-0.5">
+                            <span>免費取得 Key</span>
+                            <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                        </a>
+                    </div>
+                    <div class="relative">
+                        <input type="password" id="geminiApiKeyInput" oninput="handleApiKeyChange()" placeholder="AIzaSy..." class="w-full bg-slate-50 dark:bg-stone-800 border border-slate-200 dark:border-stone-700 rounded-xl px-3.5 py-2.5 text-xs text-slate-800 dark:text-stone-100 focus:outline-none focus:border-amber-500 pr-10 font-mono">
+                        <button type="button" onclick="togglePasswordVisibility('geminiApiKeyInput')" class="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 dark:hover:text-stone-300">
+                            👁️
+                        </button>
+                    </div>
+                    <p class="text-[10px] text-slate-400 mt-1">金鑰僅存於本機瀏覽器 LocalStorage，安全絕不外洩。</p>
+                </div>
+
+                <!-- 動態探測之模型下拉選單 -->
+                <div>
+                    <div class="flex items-center justify-between mb-1.5">
+                        <label class="block text-xs font-bold text-slate-700 dark:text-stone-300">Google 官方可用模型（動態探測）</label>
+                        <button type="button" onclick="probeAvailableModels(true)" class="text-[11px] text-amber-600 dark:text-amber-400 hover:underline flex items-center gap-1 font-medium">
+                            <span id="probeSpinner" class="hidden animate-spin inline-block w-2.5 h-2.5 border-2 border-amber-500 border-t-transparent rounded-full"></span>
+                            <span>🔍 重新探測可用端點</span>
+                        </button>
+                    </div>
+                    <select id="geminiModelSelect" class="w-full bg-slate-50 dark:bg-stone-800 border border-slate-200 dark:border-stone-700 rounded-xl px-3 py-2 text-xs text-slate-800 dark:text-stone-200 focus:outline-none focus:border-amber-500">
+                        <option value="gemini-3.5-flash">gemini-3.5-flash (推薦 · 旗艦多模態與高智力)</option>
+                        <option value="gemini-3.8-flash">gemini-3.8-flash (最新旗艦級快思)</option>
+                        <option value="gemini-3.1-flash-lite">gemini-3.1-flash-lite (超輕量低延遲)</option>
+                        <option value="gemini-flash-latest">gemini-flash-latest (動態最新別名)</option>
+                    </select>
+                    <div id="modelProbeSummary" class="text-[10px] text-slate-400 mt-1 flex items-center gap-1">
+                        <span>💡 系統已啟用自適應防 404 機制，遇停用端點將自動切換最新可用大腦。</span>
+                    </div>
+                </div>
+
+                <!-- 聯網搜尋偏好開關 -->
+                <div class="p-3 rounded-xl bg-slate-50 dark:bg-stone-800/80 border border-slate-200 dark:border-stone-700 flex items-center justify-between">
+                    <div>
+                        <div class="text-xs font-bold text-slate-700 dark:text-stone-200">實時前沿學術檢索 (Search Grounding)</div>
+                        <div class="text-[10px] text-slate-400">鍛造時動態透過 Google 實時搜尋截至當前時刻全球最新學術前沿與時代理論演進</div>
+                    </div>
+                    <input type="checkbox" id="settingsSearchGroundingCheckbox" checked class="w-4 h-4 accent-amber-500 cursor-pointer">
+                </div>
+            </div>
+
+            <!-- 模式 B：後端要塞設定區 (隱藏) -->
+            <div id="settingsBackendSection" class="hidden space-y-3.5 mb-5">
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 dark:text-stone-300 mb-1.5">後端 API 伺服器網址</label>
+                    <input type="text" id="backendUrlInput" value="http://localhost:8000/api/prompt" class="w-full bg-slate-50 dark:bg-stone-800 border border-slate-200 dark:border-stone-700 rounded-xl px-3.5 py-2 text-xs text-slate-800 dark:text-stone-100 font-mono">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-700 dark:text-stone-300 mb-1.5">指揮官通行證 (JWT Token)</label>
+                    <input type="password" id="jwtTokenInput" placeholder="貼上後端生成的 JWT..." class="w-full bg-slate-50 dark:bg-stone-800 border border-slate-200 dark:border-stone-700 rounded-xl px-3.5 py-2 text-xs text-slate-800 dark:text-stone-100 font-mono">
+                </div>
+            </div>
+
+            <!-- 按鈕列 -->
+            <div class="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-stone-800">
+                <button type="button" onclick="testConnection()" class="px-3 py-1.5 rounded-xl border border-slate-200 dark:border-stone-700 text-xs font-medium text-slate-600 dark:text-stone-300 hover:bg-slate-50 dark:hover:bg-stone-800 transition">
+                    連線探測測試
+                </button>
+                <div class="flex gap-2">
+                    <button type="button" onclick="toggleSettings()" class="px-4 py-2 rounded-xl text-xs font-medium text-slate-500 hover:bg-slate-100 dark:hover:bg-stone-800 transition">取消</button>
+                    <button type="button" onclick="saveSettings()" class="px-5 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white font-bold text-xs shadow-md shadow-amber-500/30 transition">儲存並套用</button>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <!-- 終極陣法：大腦與骨架合一 -->
-    <script>
-    let state = {
-        apiKey: localStorage.getItem('gemini_api_key') || '',
-        idea: '',
-        questions: [],
-        promptHistory: JSON.parse(localStorage.getItem('prompt_wizard_history') || '[]')
-    };
-
-    window.onload = () => {
-        console.log("📡 [系統日誌] 終極萬物歸一陣啟動，JS 引擎運轉正常！");
-        if (!state.apiKey) toggleSettings();
-        const keyInput = document.getElementById('apiKeyInput');
-        if(keyInput) keyInput.value = state.apiKey;
-        renderHistory();
-    };
-
-    function toggleSettings() {
-        document.getElementById('settingsModal').classList.toggle('hidden');
-    }
-
-    function clearHistoryCache() {
-        if(confirm("確定要清除所有歷史紀錄嗎？")) {
-            localStorage.removeItem('prompt_wizard_history');
-            state.promptHistory = [];
-            renderHistory();
-            showToast('歷史紀錄已清除');
-        }
-    }
-
-    function saveApiKey() {
-        const key = document.getElementById('apiKeyInput').value.trim();
-        if (key) {
-            localStorage.setItem('gemini_api_key', key);
-            state.apiKey = key;
-            toggleSettings();
-            showToast('API 金鑰已加密鎖定');
-        } else {
-            alert('請輸入有效的金鑰');
-        }
-    }
-
-    function showLoading(text) {
-        document.getElementById('loadingText').innerText = text;
-        document.getElementById('loadingOverlay').classList.remove('hidden');
-        document.getElementById('loadingOverlay').classList.add('flex');
-    }
-
-    function hideLoading() {
-        document.getElementById('loadingOverlay').classList.add('hidden');
-        document.getElementById('loadingOverlay').classList.remove('flex');
-    }
-
-    async function callGemini(prompt, isJsonMode = false) {
-        if (!state.apiKey) {
-            toggleSettings();
-            throw new Error("Missing API Key");
-        }
-
-        // ⚔️ 宗師級精準校準：切換至備用且穩定的 3.6-flash 分流端點，避開 3.8 滿載車潮！
-        const endpoint = `https://generativelanguage.googleapis.com/v1/models/gemini-3.6-flash:generateContent?key=${state.apiKey}`;
-        let finalPrompt = prompt;
-        if (isJsonMode) finalPrompt += `\n\n**CRITICAL: You MUST output ONLY valid JSON format. Do NOT wrap in markdown blockquotes like \`\`\`json. Just the raw JSON.**`;
-
-        try {
-            const response = await fetch(endpoint, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    contents: [{ parts: [{ text: finalPrompt }] }],
-                    generationConfig: { temperature: 0.2 }
-                })
-            });
-
-            if (!response.ok) {
-                const errData = await response.json();
-                console.error("🔴 伺服器錯誤：", errData);
-                throw new Error(errData.error.message || 'API Error');
-            }
-
-            const data = await response.json();
-            let textResult = data.candidates[0].content.parts[0].text;
-            if (isJsonMode) return JSON.parse(textResult.replace(/```json\n?/g, '').replace(/```\n?/g, '').trim());
-            return textResult;
-        } catch (error) {
-            alert("通訊干擾：" + error.message);
-            throw error;
-        }
-    }
-
-    async function startConsultation() {
-        const ideaInput = document.getElementById('ideaInput');
-        if (!ideaInput) return;
-        const val = ideaInput.value.trim();
-        if (!val) return alert("指揮官，請先輸入您的構想！");
-        
-        state.idea = val;
-        await forgeUltimatePrompt();
-    }
-
-    async function forgeUltimatePrompt() {
-        showLoading("✨ 零一正在統合大師見解，轉譯為 AI 終極詠唱...");
-        const prompt = `你現在是頂尖的 AI 提示詞工程師(Prompt Engineer)。\n【原始構想】：${state.idea}\n請將以上資訊，轉譯並濃縮成一段「完美、結構化、可直接餵給一般 AI 模型來產出結果」的 System Prompt。\n包含：1. 指定角色 (Role) 2. 任務目標 (Task) 3. 架構與限制 (Constraints) 4. 輸出要求 (Output Format)。\n直接給出要用來複製貼上的 Prompt 內容，不要任何問候語或 Markdown 代碼塊包裝。`;
-
-        try {
-            const finalPrompt = await callGemini(prompt, false);
-            
-            document.getElementById('empty-state').classList.add('hidden');
-            const preview = document.getElementById('preview-output');
-            preview.classList.remove('hidden');
-            
-            preview.innerHTML = finalPrompt
-                .replace(/^(# .*$)/gm, '<span class="text-amber-600 font-bold">$1</span>')
-                .replace(/^(- .*$)/gm, '<span class="text-slate-500 font-medium">$1</span>');
-            
-            const now = new Date();
-            const timeString = `${now.getMonth()+1}/${now.getDate()} ${now.getHours()}:${now.getMinutes().toString().padStart(2,'0')}`;
-            state.promptHistory.unshift({ 
-                idea: state.idea.substring(0, 20) + "...", 
-                text: finalPrompt, 
-                time: timeString 
-            });
-            if (state.promptHistory.length > 50) state.promptHistory.pop();
-            localStorage.setItem('prompt_wizard_history', JSON.stringify(state.promptHistory));
-            
-            renderHistory();
-            hideLoading();
-            resetToInput(true);
-        } catch (e) { 
-            hideLoading(); 
-        }
-    }
-
-    function resetToInput(keepIdea = false) {
-        document.getElementById('state-consult').classList.add('hidden');
-        document.getElementById('state-input').classList.remove('hidden');
-        if(!keepIdea) document.getElementById('ideaInput').value = '';
-    }
-
-    function renderHistory() {
-        const container = document.getElementById('history-container');
-        if (!container) return;
-        if(state.promptHistory.length === 0) {
-            container.innerHTML = '<div class="text-center py-10 text-slate-400 text-sm font-medium">尚無記憶檔案</div>';
-            return;
-        }
-        container.innerHTML = state.promptHistory.map((item, idx) => `
-            <div class="group bg-white/40 hover:bg-white/80 border border-white/60 rounded-xl p-4 cursor-pointer transition-all duration-300 relative shadow-sm hover:shadow-md" onclick="viewHistory(${idx})">
-                <h3 class="text-sm font-bold text-slate-700 group-hover:text-amber-600 mb-1 transition-colors">${item.idea || '歷史詠唱紀錄'}</h3>
-                <p class="text-xs text-slate-500 line-clamp-2">${item.text}</p>
-                <div class="mt-3 text-right"><span class="text-[10px] font-mono text-slate-400 bg-white/50 px-2 py-1 rounded-md border border-slate-100">${item.time}</span></div>
+    <!-- ============================================== -->
+    <!-- 彈出視窗 2：記憶階梯深化彈窗 (Ladder Climb Modal) -->
+    <!-- ============================================== -->
+    <div id="ladderClimbModal" class="hidden fixed inset-0 bg-slate-950/60 backdrop-blur-md z-50 flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-stone-900 border border-slate-200 dark:border-stone-700 w-full max-w-xl rounded-2xl shadow-2xl p-6 relative flex flex-col">
+            <div class="flex items-center justify-between mb-3 shrink-0">
+                <div class="flex items-center gap-2">
+                    <span class="text-xl">🪜</span>
+                    <div>
+                        <h3 class="text-base font-bold text-slate-800 dark:text-stone-100">攀登記憶階梯 · 萬相深化鍛造</h3>
+                        <p class="text-[11px] text-slate-400">承接當前法典基石，進行下一階段的時代前沿淬鍊</p>
+                    </div>
+                </div>
+                <button onclick="closeLadderClimbModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-stone-200 p-1">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
             </div>
-        `).join('');
-    }
 
-    function viewHistory(idx) {
-        const data = state.promptHistory[idx];
-        document.getElementById('empty-state').classList.add('hidden');
-        const preview = document.getElementById('preview-output');
-        preview.classList.remove('hidden');
-        preview.innerHTML = data.text
-                .replace(/^(# .*$)/gm, '<span class="text-amber-600 font-bold">$1</span>')
-                .replace(/^(- .*$)/gm, '<span class="text-slate-500 font-medium">$1</span>');
-    }
+            <p class="text-xs text-slate-500 dark:text-stone-400 mb-3">請選擇或輸入您希望在第 <span id="modalNextLadderLevel" class="font-bold text-amber-500">2</span> 階中重點強化的維度：</p>
 
-    function copyToClipboard() {
-        const preview = document.getElementById('preview-output');
-        if(preview.classList.contains('hidden')) return;
+            <!-- 階梯深化快捷指令標籤 -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4">
+                <button type="button" onclick="selectLadderDirective(this, '結合實時最新學術論文與邊界研究，注入 3 個極端反例 (Edge Cases) 與嚴格過濾邏輯。')" class="p-2.5 rounded-xl border border-slate-200 dark:border-stone-700 bg-slate-50 dark:bg-stone-800 text-left text-xs hover:border-amber-500 transition text-slate-700 dark:text-stone-200">
+                    🧪 注入前沿極端案例 (Edge Cases)
+                </button>
+                <button type="button" onclick="selectLadderDirective(this, '升級至軍事堡壘級防禦：加入強標籤隔離 <system_instructions>、防止越獄指令覆蓋與反逆向工程解構。')" class="p-2.5 rounded-xl border border-slate-200 dark:border-stone-700 bg-slate-50 dark:bg-stone-800 text-left text-xs hover:border-amber-500 transition text-slate-700 dark:text-stone-200">
+                    🏰 注入軍事防越獄與標籤隔離
+                </button>
+                <button type="button" onclick="selectLadderDirective(this, '進行 Token 經濟壓縮：在不減損宗師智慧前提下精簡 30% 贅字，並轉為結構化 Schema。')" class="p-2.5 rounded-xl border border-slate-200 dark:border-stone-700 bg-slate-50 dark:bg-stone-800 text-left text-xs hover:border-amber-500 transition text-slate-700 dark:text-stone-200">
+                    📦 精簡 Token 結構並優化版面
+                </button>
+                <button type="button" onclick="selectLadderDirective(this, '依據實時最新時代典範轉移，為此 Prompt 增添完整真實的 Few-Shot 示範案例。')" class="p-2.5 rounded-xl border border-slate-200 dark:border-stone-700 bg-slate-50 dark:bg-stone-800 text-left text-xs hover:border-amber-500 transition text-slate-700 dark:text-stone-200">
+                    ✨ 注入新時代 Few-Shot 範例
+                </button>
+            </div>
 
-        navigator.clipboard.writeText(preview.innerText).then(() => {
-            showToast('已複製至剪貼簿！');
-        });
-    }
+            <!-- 自訂深化指令輸入 -->
+            <div class="mb-4">
+                <label class="block text-xs font-bold text-slate-700 dark:text-stone-300 mb-1">自訂深化指令：</label>
+                <textarea id="ladderCustomDirectiveInput" class="w-full bg-slate-50 dark:bg-stone-800 border border-slate-200 dark:border-stone-700 rounded-xl p-3 text-xs text-slate-800 dark:text-stone-100 focus:outline-none focus:border-amber-500 h-20 resize-none" placeholder="例如：我想針對最新的多智能體星域通訊協議做更嚴謹的有限狀態機定義..."></textarea>
+            </div>
 
-    function showToast(message) {
-        const toast = document.getElementById('toast');
-        if(!toast) return;
-        const span = toast.querySelector('span');
-        if(span) span.innerText = message;
-        toast.classList.remove('translate-y-20', 'opacity-0');
-        setTimeout(() => {
-            toast.classList.add('translate-y-20', 'opacity-0');
-        }, 2500);
-    }
-    </script>
+            <!-- 執行深化按鈕 -->
+            <div class="flex items-center justify-end gap-2 pt-2 border-t border-slate-100 dark:border-stone-800">
+                <button onclick="closeLadderClimbModal()" class="px-4 py-2 rounded-xl text-xs font-medium text-slate-500 hover:bg-slate-100 dark:hover:bg-stone-800 transition">取消</button>
+                <button onclick="executeLadderClimb()" class="px-5 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white font-bold text-xs shadow-md shadow-amber-500/30 transition flex items-center gap-1.5">
+                    <span>⚡ 沿階梯向上鍛造</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- 彈出視窗 3：時代典範探索羅盤 (Epochal Paradigm Compass Modal) -->
+    <!-- ============================================== -->
+    <div id="presetsModal" class="hidden fixed inset-0 bg-slate-950/60 backdrop-blur-md z-50 flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-stone-900 border border-slate-200 dark:border-stone-700 w-full max-w-2xl rounded-2xl shadow-2xl p-6 relative max-h-[85vh] flex flex-col">
+            <div class="flex items-center justify-between mb-3 shrink-0">
+                <div class="flex items-center gap-2">
+                    <span class="text-xl">🧭</span>
+                    <div>
+                        <h3 class="text-base font-bold text-slate-800 dark:text-stone-100">時代典範探索羅盤 · 跨維度思維演進錦囊</h3>
+                        <p class="text-[11px] text-slate-400">見證人類從地平到地圓、陸運到深空的典範轉移，召喚前沿宗師進駐</p>
+                    </div>
+                </div>
+                <button onclick="closePresetsModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-stone-200 p-1">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+            <p class="text-xs text-slate-500 dark:text-stone-400 mb-4 shrink-0">點擊探索任一時代範式轉移，系統將自動定位該學術領域、召喚對應跨代宗師並載入最新前沿研究：</p>
+
+            <div class="flex-1 overflow-y-auto space-y-3 pr-1">
+                <!-- 典範 1: 航太與深空推進 -->
+                <div onclick="applyPreset(0)" class="group p-4 rounded-xl border border-slate-200/80 dark:border-stone-700 bg-slate-50/50 dark:bg-stone-800/50 hover:border-amber-500 dark:hover:border-amber-400 cursor-pointer transition">
+                    <div class="flex items-center justify-between mb-1.5">
+                        <span class="text-xs font-bold text-slate-800 dark:text-stone-100 group-hover:text-amber-600 dark:group-hover:text-amber-400">🚀 交通與推進範式躍遷（陸運 ➔ 海運 ➔ 空運 ➔ 跨行星深空探索）</span>
+                        <span class="text-[10px] bg-purple-500/10 text-purple-600 dark:text-purple-400 px-2 py-0.5 rounded font-mono">齊奧爾科夫斯基 + 馬斯克 + 馮·布朗</span>
+                    </div>
+                    <p class="text-[11px] text-slate-500 dark:text-stone-400 line-clamp-2">從化學燃料火箭到核熱推進 (NTP) 與光子帆軌道計算，建立涵蓋霍曼轉移、相對論引力彈弓與星際自主導航的 System Prompt。</p>
+                </div>
+
+                <!-- 典範 2: 計算架構與量子網絡 -->
+                <div onclick="applyPreset(1)" class="group p-4 rounded-xl border border-slate-200/80 dark:border-stone-700 bg-slate-50/50 dark:bg-stone-800/50 hover:border-amber-500 dark:hover:border-amber-400 cursor-pointer transition">
+                    <div class="flex items-center justify-between mb-1.5">
+                        <span class="text-xs font-bold text-slate-800 dark:text-stone-100 group-hover:text-amber-600 dark:group-hover:text-amber-400">💻 計算範式演進（機械差分機 ➔ 馮紐曼架構 ➔ 量子退相干與神經星域）</span>
+                        <span class="text-[10px] bg-purple-500/10 text-purple-600 dark:text-purple-400 px-2 py-0.5 rounded font-mono">圖靈 + 費曼 + 狄拉克</span>
+                    </div>
+                    <p class="text-[11px] text-slate-500 dark:text-stone-400 line-clamp-2">跨越傳統二元邏輯，融合量子疊加態糾錯、神經形態擬態運算與分散式多智能體共識架構，鍛造頂級超架構師 Prompt。</p>
+                </div>
+
+                <!-- 典範 3: 金融與複雜非對稱博弈 -->
+                <div onclick="applyPreset(2)" class="group p-4 rounded-xl border border-slate-200/80 dark:border-stone-700 bg-slate-50/50 dark:bg-stone-800/50 hover:border-amber-500 dark:hover:border-amber-400 cursor-pointer transition">
+                    <div class="flex items-center justify-between mb-1.5">
+                        <span class="text-xs font-bold text-slate-800 dark:text-stone-100 group-hover:text-amber-600 dark:group-hover:text-amber-400">📈 金融範式躍遷（貴金屬實物 ➔ 央行信用 ➔ 高頻量化與鏈上自主博弈）</span>
+                        <span class="text-[10px] bg-purple-500/10 text-purple-600 dark:text-purple-400 px-2 py-0.5 rounded font-mono">吉姆·西蒙斯 + 中本聰 + 蒙格</span>
+                    </div>
+                    <p class="text-[11px] text-slate-500 dark:text-stone-400 line-clamp-2">以太極雙均線假突破過濾為引，導入曼德博碎形理論、非對稱套利矩陣與自動化回測風控協議，徹底消滅過擬合盲點。</p>
+                </div>
+
+                <!-- 典範 4: 生命科學與遺傳編程 -->
+                <div onclick="applyPreset(3)" class="group p-4 rounded-xl border border-slate-200/80 dark:border-stone-700 bg-slate-50/50 dark:bg-stone-800/50 hover:border-amber-500 dark:hover:border-amber-400 cursor-pointer transition">
+                    <div class="flex items-center justify-between mb-1.5">
+                        <span class="text-xs font-bold text-slate-800 dark:text-stone-100 group-hover:text-amber-600 dark:group-hover:text-amber-400">🧬 生命編程典範（孟德爾碗豆 ➔ 雙螺旋 ➔ CRISPR-Cas 與蛋白質生成式AI）</span>
+                        <span class="text-[10px] bg-purple-500/10 text-purple-600 dark:text-purple-400 px-2 py-0.5 rounded font-mono">珍妮佛·杜德納 + 薛丁格 + 達爾文</span>
+                    </div>
+                    <p class="text-[11px] text-slate-500 dark:text-stone-400 line-clamp-2">檢索實時最新蛋白質折疊模型 (AlphaFold 3/4) 與靶向修復研究，鍛造具備高精準生醫倫理邊界與實驗設計的法典。</p>
+                </div>
+
+                <!-- 典範 5: 心智哲學與自由能原理 -->
+                <div onclick="applyPreset(4)" class="group p-4 rounded-xl border border-slate-200/80 dark:border-stone-700 bg-slate-50/50 dark:bg-stone-800/50 hover:border-amber-500 dark:hover:border-amber-400 cursor-pointer transition">
+                    <div class="flex items-center justify-between mb-1.5">
+                        <span class="text-xs font-bold text-slate-800 dark:text-stone-100 group-hover:text-amber-600 dark:group-hover:text-amber-400">🧠 認知範式轉移（心物二元論 ➔ 行為主義 ➔ 自由能原理與具身智能）</span>
+                        <span class="text-[10px] bg-purple-500/10 text-purple-600 dark:text-purple-400 px-2 py-0.5 rounded font-mono">卡爾·弗里斯頓 + 卡尼曼 + 亞里斯多德</span>
+                    </div>
+                    <p class="text-[11px] text-slate-500 dark:text-stone-400 line-clamp-2">運用主動推論 (Active Inference) 與行為偏誤修辭學，產出能深度引導人類決策、具備超高轉化率與同理共鳴的認知工程 Prompt。</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- 彈出視窗 4：系統自我演進檢視與更新中心 (Evolution Sentinel Modal) -->
+    <!-- ============================================== -->
+    <div id="systemInspectionModal" class="hidden fixed inset-0 bg-slate-950/60 backdrop-blur-md z-50 flex items-center justify-center p-4">
+        <div class="bg-white dark:bg-stone-900 border border-slate-200 dark:border-stone-700 w-full max-w-2xl rounded-2xl shadow-2xl p-6 relative flex flex-col max-h-[90vh] overflow-y-auto">
+            <div class="flex items-center justify-between mb-4 pb-3 border-b border-slate-100 dark:border-stone-800 shrink-0">
+                <div class="flex items-center gap-2.5">
+                    <span class="text-2xl">🩺</span>
+                    <div>
+                        <h3 class="text-base font-bold text-slate-800 dark:text-stone-100 flex items-center gap-2">
+                            <span>萬相星域 · 系統演進自檢與更新中心</span>
+                            <span id="inspectionOverallBadge" class="text-[10px] bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 px-2 py-0.5 rounded-full font-bold">全時在線</span>
+                        </h3>
+                        <p class="text-xs text-slate-400">實時監控 AI 神經大腦、圖書館儲存健全度與全時前沿科技檢索狀態</p>
+                    </div>
+                </div>
+                <button onclick="closeSystemInspectionModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-stone-200 p-1">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                </button>
+            </div>
+
+            <!-- 自我檢測四項核心指標 -->
+            <div class="space-y-3 mb-5" id="inspectionItemsContainer">
+                <!-- 動態注入檢測卡片 -->
+            </div>
+
+            <!-- 與時俱進更新建議專區 -->
+            <div id="inspectionRecommendationsCard" class="hidden p-4 rounded-xl bg-gradient-to-r from-amber-500/10 via-orange-500/10 to-transparent border border-amber-500/30 mb-4">
+                <div class="flex items-center gap-2 mb-2">
+                    <span class="text-lg">🚀</span>
+                    <h4 class="text-xs font-bold text-amber-800 dark:text-amber-300">發現可演進項目 (Recommended Actions)</h4>
+                </div>
+                <div id="inspectionRecommendationsList" class="text-xs text-slate-700 dark:text-stone-300 space-y-1.5 mb-3">
+                    <!-- 動態注入建議列表 -->
+                </div>
+                <button type="button" id="applyRecommendationsBtn" onclick="applyInspectionRecommendations()" class="px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-white font-bold text-xs shadow-md shadow-amber-500/30 transition flex items-center gap-1.5">
+                    <span>⚡ 一鍵套用最佳演進設定</span>
+                </button>
+            </div>
+
+            <!-- 底部動作按鈕 -->
+            <div class="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-stone-800 shrink-0">
+                <button type="button" onclick="runSystemSelfInspection(true)" class="px-3.5 py-1.5 rounded-xl border border-slate-200 dark:border-stone-700 text-xs font-medium text-slate-600 dark:text-stone-300 hover:bg-slate-50 dark:hover:bg-stone-800 transition flex items-center gap-1.5">
+                    <span id="reprobeSpinner" class="hidden animate-spin inline-block w-3 h-3 border-2 border-slate-500 border-t-transparent rounded-full"></span>
+                    <span>🔄 重新執行全域自檢</span>
+                </button>
+                <button onclick="closeSystemInspectionModal()" class="px-5 py-2 rounded-xl bg-slate-100 dark:bg-stone-800 hover:bg-slate-200 dark:hover:bg-stone-700 text-slate-700 dark:text-stone-200 text-xs font-semibold transition">
+                    關閉
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- 微互動 Toast 提示條 (Floating Notification) -->
+    <!-- ============================================== -->
+    <div id="toast" class="fixed bottom-6 right-6 px-5 py-3 rounded-2xl bg-slate-900/90 dark:bg-stone-800/95 text-white shadow-2xl border border-white/20 transform translate-y-24 opacity-0 transition-all duration-300 flex items-center gap-3 z-50 backdrop-blur-md">
+        <div id="toastIcon" class="w-3 h-3 rounded-full bg-emerald-400 shadow-[0_0_10px_rgba(52,211,153,0.8)]"></div>
+        <span id="toastMsg" class="text-xs font-bold">提示訊息</span>
+    </div>
+
+    <!-- 核心 JavaScript 引擎 -->
+    <script src="js/app.js"></script>
 </body>
 </html>
