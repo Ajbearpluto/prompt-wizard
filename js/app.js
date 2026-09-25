@@ -25,6 +25,13 @@ const state = {
     securityLevel: 'fortress', // 'fortress' 或 'standard'
     targetModel: 'universal', // 'universal', 'claude', 'chatgpt', 'gemini', 'cursor', 'deepseek'
 
+    // 延續接問與持續微調流 (Continuous Follow-up & Refinement Stream)
+    isFollowUpMode: false,
+    followUpTurn: 1,
+    followUpParentPrompt: '',
+    followUpParentIdea: '',
+    followUpStage1: '',
+
     // 記憶階梯系統 (The Memory Ladder)
     ladderLevel: 1, // 1: 雛形草創, 2: 宗師對搞, 3: 實戰淬鍊, 4: 終極法典
     ladderTreeId: null,
@@ -246,7 +253,11 @@ async function probeAvailableModels(manual = false) {
             supported.sort((a, b) => {
                 const getScore = (name) => {
                     let score = 0;
-                    // 動態抽取版本號，如 4.0, 3.5
+                    // Gemma 模型（例如 gemma-4-26b-a4b-it）並非 Gemini 旗艦模型，且常不支援 systemInstruction 或 Google Search Grounding，大幅降低權重
+                    if (name.includes('gemma')) score -= 100;
+                    if (name.startsWith('gemini')) score += 50;
+
+                    // 動態抽取版本號，如 4.0, 3.5, 2.5
                     const verMatch = name.match(/gemini-(\d+(\.\d+)?)/);
                     if (verMatch) {
                         score += parseFloat(verMatch[1]) * 25;
@@ -259,6 +270,14 @@ async function probeAvailableModels(manual = false) {
                 };
                 return getScore(b.name) - getScore(a.name);
             });
+
+            // 若當前所選模型為空、包含 gemma 或不在官方可用清單中，自動設為首選旗艦模型
+            if (supported.length > 0) {
+                if (!state.geminiModel || state.geminiModel.includes('gemma') || !supported.some(m => m.id === state.geminiModel)) {
+                    state.geminiModel = supported[0].id;
+                    localStorage.setItem('pw_gemini_model', state.geminiModel);
+                }
+            }
 
             state.availableModels = supported;
             localStorage.setItem('pw_available_models', JSON.stringify(supported));
@@ -326,7 +345,7 @@ function quickInsertMaster(title) {
 }
 
 function clearCurrentInput() {
-    if (confirm("確定要重設當前輸入的構想、附件、宗師錨點與階梯嗎？")) {
+    if (confirm("確定要重設當前輸入的構想、附件、宗師錨點、階梯與延續模式嗎？")) {
         document.getElementById('ideaInput').value = '';
         const customInput = document.getElementById('customMastersInput');
         if (customInput) customInput.value = '';
@@ -335,6 +354,7 @@ function clearCurrentInput() {
         state.attachments = [];
         renderAttachments();
         exitLadderMode();
+        exitFollowUpMode();
         showToast('已重置鍛造工作台');
     }
 }
@@ -621,13 +641,97 @@ function exitLadderMode() {
 }
 
 // =========================================================================
+// 8.1 延續接問與持續微調流 (Continuous Follow-up & Iterative Tuning Stream)
+// =========================================================================
+function startFollowUpMode() {
+    if (!state.currentResult || !state.currentResult.ultimatePrompt) {
+        showToast('請先完成第 1 輪法典鍛造，方可進行延續接問！', 'warn');
+        return;
+    }
+
+    state.isFollowUpMode = true;
+    state.followUpTurn = (state.followUpTurn || 1) + 1;
+    state.followUpParentPrompt = state.currentResult.ultimatePrompt;
+    state.followUpParentIdea = state.currentResult.idea || '';
+    state.followUpStage1 = state.currentResult.stage1 || '';
+
+    // 顯示延續提示條
+    const banner = document.getElementById('followUpModeBanner');
+    if (banner) {
+        banner.classList.remove('hidden');
+        const turnCountEl = document.getElementById('followUpTurnCount');
+        if (turnCountEl) turnCountEl.innerText = state.followUpTurn;
+        const parentTitleEl = document.getElementById('followUpParentTitle');
+        if (parentTitleEl) {
+            parentTitleEl.innerText = `已錨定前輪成果：「${state.followUpParentIdea.slice(0, 35)}...」將承接前輪架構進行細節調優`;
+        }
+    }
+
+    // 鍛造按鈕文字變更
+    const forgeBtnText = document.getElementById('forgeBtnText');
+    if (forgeBtnText) {
+        forgeBtnText.innerText = `💬 延續接問 · 注入第 ${state.followUpTurn} 輪調優`;
+    }
+
+    // 清空輸入框以利輸入微調追問，並切換導引用語
+    const ideaInput = document.getElementById('ideaInput');
+    if (ideaInput) {
+        ideaInput.value = '';
+        ideaInput.placeholder = `【延續接問 · 第 ${state.followUpTurn} 輪】\n請在此輸入您想延續追問或微調的具體細節...\n例如：「針對上述節慶感知，如果當天同時有兩三個節日，如何進行雙向融合設計？」、「請將資安防禦強化為對外公開 API 模式」等\n系統將自動承接前一輪法典成果進行精準調優，免刷新頁面！`;
+        ideaInput.focus();
+    }
+
+    showToast(`💬 已進入第 ${state.followUpTurn} 輪【延續接問模式】，請輸入追問指示！`, 'info');
+}
+
+function exitFollowUpMode() {
+    state.isFollowUpMode = false;
+    state.followUpTurn = 1;
+    state.followUpParentPrompt = '';
+    state.followUpParentIdea = '';
+    state.followUpStage1 = '';
+
+    const banner = document.getElementById('followUpModeBanner');
+    if (banner) banner.classList.add('hidden');
+
+    const forgeBtnText = document.getElementById('forgeBtnText');
+    if (forgeBtnText) {
+        forgeBtnText.innerText = '啟動萬相中介 · 檢索前沿並鍛造終極法典';
+    }
+
+    const ideaInput = document.getElementById('ideaInput');
+    if (ideaInput) {
+        ideaInput.placeholder = '【在此提出您的任何學術、技術、商業或哲學構想】\n無論是「量子退相干演算法」、「CRISPR 非靶向切割抑制」、「星際航行軌道推進」、「去中心化拜占庭容錯博弈」，或是「結合太極雙均線過濾假突破」...\n\n系統將立即檢索最新學術前沿，召喚人類知識庫中最對應的古今宗師進駐，為您解構並轉譯為機器能完美執行的 Prompt！\n💡 小提示：您可以直接按下 Ctrl + V 貼上螢幕截圖，或拖曳代碼/架構圖檔案到此！';
+    }
+}
+
+function startNewSession() {
+    exitFollowUpMode();
+    exitLadderMode();
+    state.idea = '';
+    state.customMasters = '';
+    state.attachments = [];
+    renderAttachments();
+
+    const ideaInput = document.getElementById('ideaInput');
+    if (ideaInput) {
+        ideaInput.value = '';
+        ideaInput.focus();
+    }
+    const customInput = document.getElementById('customMastersInput');
+    if (customInput) customInput.value = '';
+
+    showToast('✨ 已重置為全新題目，可隨時開始新探索！', 'success');
+}
+
+// =========================================================================
 // 9. 萬相鍛造核心引擎與自愈降級鏈 (Forging Engine with Self-Healing Fallback)
 // =========================================================================
 async function startForgingProcess() {
     const rawIdea = document.getElementById('ideaInput').value.trim();
     const customMasters = document.getElementById('customMastersInput')?.value.trim() || '';
 
-    if (!rawIdea && state.attachments.length === 0 && !state.ladderParentPrompt) {
+    if (!rawIdea && state.attachments.length === 0 && !state.ladderParentPrompt && !state.followUpParentPrompt) {
         showToast('請輸入您的學術、技術或商業構想，或上傳相關檔案！', 'warn');
         document.getElementById('ideaInput').focus();
         return;
@@ -668,7 +772,11 @@ async function startForgingProcess() {
 
         processForgeResult(resultMarkdown, groundingData);
         updateLadderStepperUI(state.ladderLevel);
-        showToast(`✨ 第 ${state.ladderLevel} 階萬相法典鍛造完成！`);
+        if (state.isFollowUpMode) {
+            showToast(`✨ 第 ${state.followUpTurn} 輪延續微調法典鍛造完成！`);
+        } else {
+            showToast(`✨ 第 ${state.ladderLevel} 階萬相法典鍛造完成！`);
+        }
 
     } catch (err) {
         console.error("鍛造失敗:", err);
@@ -690,11 +798,12 @@ async function callDirectGeminiAPIWithSelfHealing() {
     const candidateFallbackQueue = Array.from(new Set([
         state.geminiModel,
         ...probedIds,
+        'gemini-2.5-flash',
+        'gemini-1.5-flash',
+        'gemini-2.0-flash',
         'gemini-3.5-flash',
-        'gemini-3.8-flash',
-        'gemini-3.1-flash-lite',
         'gemini-flash-latest'
-    ]));
+    ])).filter(id => id && !id.includes('gemma'));
 
     let lastError = null;
 
@@ -746,7 +855,17 @@ async function invokeGeminiDirect(modelName, useSearchGrounding = false) {
     let userPromptText = "";
     userPromptText += `【萬相實時時間錨點 (Dynamic Real-Time Anchor)】：當前系統調用基準時間為 ${currentTimestamp}。請以此時此刻為基準，嚴禁停留於過往陳舊版本或靜態歷史年份，聯網搜尋並採納截至 ${currentDateStr} 最新的學術理論、框架標準與發布事實！\n\n`;
 
-    if (state.ladderParentPrompt && state.ladderLevel > 1) {
+    if (state.isFollowUpMode && state.followUpParentPrompt) {
+        userPromptText += `【萬相星域 · 延續接問與持續微調 (Continuous Follow-up & Refinement Turn ${state.followUpTurn})】：\n`;
+        userPromptText += `本輪任務是基於上一輪使用者產出的終極 System Prompt 進行「延續性深化、追問與細節調整」。\n`;
+        userPromptText += `【前一輪任務背景 / 原始構想】：\n${state.followUpParentIdea || '無'}\n\n`;
+        userPromptText += `【前一輪已淬煉之終極 System Prompt 基石】：\n--- 前一輪 System Prompt 開始 ---\n${state.followUpParentPrompt}\n--- 前一輪 System Prompt 結束 ---\n\n`;
+        if (state.followUpStage1) {
+            userPromptText += `【前一輪宗師會診洞見精華】：\n${state.followUpStage1.slice(0, 800)}\n\n`;
+        }
+        userPromptText += `【使用者本輪延續追加之微調指示 / 新需求】：\n${state.idea}\n\n`;
+        userPromptText += `【執行核心指令】：請宗師團隊承接上一輪建立的架構基石，將使用者的最新追加要求與微調細節完整融合，並直接輸出更新後的全新版本【三階段產出】與【終極 System Prompt】。必須維持上一輪已具備的資安邊界防護與前沿缺陷免疫協議！\n\n`;
+    } else if (state.ladderParentPrompt && state.ladderLevel > 1) {
         userPromptText += `【記憶階梯進化指示 · 第 ${state.ladderLevel} 階】\n`;
         userPromptText += `本任務是基於以下【上一階 System Prompt 基石】進行定向深化與時代範式淬鍊：\n`;
         userPromptText += `--- 上一階法典基石開始 ---\n${state.ladderParentPrompt}\n--- 上一階法典基石結束 ---\n\n`;
@@ -836,7 +955,9 @@ async function callBackendFortressAPI() {
 
     const textFiles = state.attachments.filter(a => a.isText);
     let fullContext = "";
-    if (state.ladderParentPrompt) {
+    if (state.isFollowUpMode && state.followUpParentPrompt) {
+        fullContext += `【前輪延續基石 (第 ${state.followUpTurn - 1} 輪)】：\n${state.followUpParentPrompt}\n\n`;
+    } else if (state.ladderParentPrompt) {
         fullContext += `【上一階基石法典】：\n${state.ladderParentPrompt}\n\n`;
     }
     if (textFiles.length > 0) {
@@ -914,11 +1035,23 @@ function processForgeResult(markdownText, groundingMetadata = null) {
         stage3,
         ultimatePrompt,
         timestamp: new Date().toISOString(),
-        idea: state.idea || '萬相學術構想',
+        idea: state.idea || (state.isFollowUpMode ? `[第${state.followUpTurn}輪] ` + (state.followUpParentIdea || '延續微調') : '萬相學術構想'),
         ladderLevel: state.ladderLevel,
         ladderTreeId: state.ladderTreeId,
+        followUpTurn: state.isFollowUpMode ? state.followUpTurn : 1,
         groundingMetadata
     };
+
+    // 若處於延續接問模式，將當前成果更新為下一輪基石，以便連續追問
+    if (state.isFollowUpMode) {
+        state.followUpParentPrompt = ultimatePrompt;
+        const turnCountEl = document.getElementById('followUpTurnCount');
+        if (turnCountEl) turnCountEl.innerText = state.followUpTurn;
+        const parentTitleEl = document.getElementById('followUpParentTitle');
+        if (parentTitleEl) {
+            parentTitleEl.innerText = `已鎖定第 ${state.followUpTurn} 輪成果，可繼續直接追問或調整下一細節`;
+        }
+    }
 
     renderStageContent();
     saveToHistory(state.currentResult);
@@ -948,7 +1081,8 @@ function renderStageContent() {
     s3CodeEl.innerText = ultimatePrompt;
 
     document.getElementById('promptOnlyTextarea').value = ultimatePrompt;
-    document.getElementById('promptStatsToken').innerText = `約 ${ultimatePrompt.length} 字 · 預估 ${Math.round(ultimatePrompt.length / 2.5)} Tokens · 第 ${state.ladderLevel} 階`;
+    const turnInfo = (state.isFollowUpMode && state.followUpTurn > 1) ? ` · 第 ${state.followUpTurn} 輪延續` : '';
+    document.getElementById('promptStatsToken').innerText = `約 ${ultimatePrompt.length} 字 · 預估 ${Math.round(ultimatePrompt.length / 2.5)} Tokens · 第 ${state.ladderLevel} 階${turnInfo}`;
 
     const rawEl = document.getElementById('viewRawMarkdown');
     if (window.marked && typeof window.marked.parse === 'function') {
@@ -1216,6 +1350,7 @@ function saveToHistory(resultObj) {
         time: timeFormatted,
         ladderLevel: resultObj.ladderLevel || 1,
         ladderTreeId: resultObj.ladderTreeId,
+        followUpTurn: resultObj.followUpTurn || (state.isFollowUpMode ? state.followUpTurn : 1),
         groundingMetadata: resultObj.groundingMetadata,
         category: autoCat,
         isStarred: false
@@ -1292,6 +1427,10 @@ function renderHistory(filterText = '') {
                         <span class="text-[9px] font-bold px-1.5 py-0.2 rounded ${item.ladderLevel > 1 ? 'bg-amber-500 text-white' : 'bg-slate-200 dark:bg-stone-700 text-slate-600 dark:text-stone-300'}">
                             🪜 L${item.ladderLevel || 1}
                         </span>
+                        ${item.followUpTurn && item.followUpTurn > 1 ? `
+                        <span class="text-[9px] font-bold px-1.5 py-0.2 rounded bg-blue-500 text-white">
+                            💬 輪次 ${item.followUpTurn}
+                        </span>` : ''}
                         <span class="text-[10px] font-mono text-slate-400">${item.time}</span>
                     </div>
                     <div class="flex items-center gap-1">
@@ -1319,9 +1458,11 @@ function loadHistoryItem(id) {
     const item = state.promptHistory.find(i => i.id === id);
     if (!item) return;
 
+    exitFollowUpMode();
     state.ladderLevel = item.ladderLevel || 1;
     state.ladderTreeId = item.ladderTreeId || null;
     state.ladderParentPrompt = item.ultimatePrompt;
+    state.followUpTurn = item.followUpTurn || 1;
 
     state.currentResult = {
         id: item.id,
@@ -1333,6 +1474,7 @@ function loadHistoryItem(id) {
         idea: item.fullIdea || item.idea,
         ladderLevel: item.ladderLevel || 1,
         ladderTreeId: item.ladderTreeId,
+        followUpTurn: item.followUpTurn || 1,
         groundingMetadata: item.groundingMetadata
     };
 
