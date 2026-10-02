@@ -347,6 +347,9 @@
                             <p class="text-xs text-slate-500 dark:text-stone-400 mt-0.5">無論何種領域，系統將作為全知中介，搜尋學術文獻與時代典範，召喚相應宗師淬煉為 AI 終極指令</p>
                         </div>
                         <div class="flex items-center gap-1.5">
+                            <button type="button" onclick="insertUniversalAntiDriftTemplate()" class="text-xs font-semibold text-indigo-700 dark:text-indigo-300 bg-indigo-500/15 hover:bg-indigo-500/25 px-2.5 py-1 rounded-lg border border-indigo-500/30 transition flex items-center gap-1" title="載入指揮官萬用防偏航模板（骨架優先、嚴格紅線、因果拆解 If-Then）">
+                                <span>🛡️ 萬用防偏航模板</span>
+                            </button>
                             <button type="button" onclick="startNewSession()" class="text-xs font-semibold text-amber-800 dark:text-amber-300 bg-amber-500/15 hover:bg-amber-500/25 px-2.5 py-1 rounded-lg border border-amber-500/30 transition flex items-center gap-1" title="清空當前輸入與附件，隨時開始一個全新題目，免刷新頁面">
                                 <span>✨ 另起新題</span>
                             </button>
@@ -362,7 +365,7 @@
                         <textarea 
                             id="ideaInput"
                             class="w-full flex-1 bg-transparent p-4 text-slate-800 dark:text-stone-100 resize-none focus:outline-none text-sm leading-relaxed placeholder-slate-400 dark:placeholder-stone-500"
-                            placeholder="【在此提出您的任何學術、技術、商業或哲學構想】&#10;無論是「量子退相干演算法」、「CRISPR 非靶向切割抑制」、「星際航行軌道推進」、「去中心化拜占庭容錯博弈」，或是「結合太極雙均線過濾假突破」...&#10;&#10;系統將立即檢索最新學術前沿，召喚人類知識庫中最對應的古今宗師進駐，為您解構並轉譯為機器能完美執行的 Prompt！&#10;💡 小提示：您可以直接按下 Ctrl + V 貼上螢幕截圖，或拖曳代碼/架構圖檔案到此！"
+                            placeholder="【在此提出您的任何技術、遊戲機制、商業演算法或哲學構想】&#10;・想做「馬力歐模式」？請說明「2D 平台橫向卷軸、AABB 碰撞盒、狀態機 FSM」或點擊上方「🛡️ 萬用防偏航模板」自動帶入骨架！&#10;・想進行「零一 · 白帽資安」？輸入需要進行滲透防禦加固或代碼審查的模組...&#10;・無論是「太極雙均線量化博弈」還是「量子退相干演算法」，系統將強制進行骨架梳理、嚴格紅線防偷懶與因果拆解！&#10;&#10;💡 小提示：可直接按 Ctrl + V 貼上螢幕截圖，或拖曳代碼/文件到此！"
                         ></textarea>
 
                         <!-- 多模態附件預覽列 (Thumbnails Strip) -->
@@ -408,7 +411,7 @@
                                 <input 
                                     type="text" 
                                     id="customMastersInput" 
-                                    placeholder="🔍 指定進駐宗師/學派 (例如：中本聰、珍·古德、彭羅斯、納許、愛因斯坦、現代量子前沿學派... 留空則全自動智能調度)" 
+                                    placeholder="🔍 指定進駐宗師/學派 (例如：中本聰、珍·古德、彭羅斯、納許、愛因斯坦、白帽駭客學派... 留空則全自動智能調度)" 
                                     class="w-full bg-white dark:bg-stone-800 border border-slate-200 dark:border-stone-700 rounded-lg px-3 py-1.5 text-xs text-slate-700 dark:text-stone-200 focus:outline-none focus:border-amber-500"
                                 >
                             </div>
@@ -416,6 +419,12 @@
                             <!-- 跨學科星域快速探測錨點 -->
                             <div class="flex flex-wrap gap-1.5" id="mastersChipsContainer">
                                 <button type="button" onclick="quickInsertMaster('🌌 全自動星域神諭 (動態調度最契合權威)')" class="chip-selectable active text-xs px-2.5 py-0.5 rounded-lg bg-amber-500 text-white font-medium">🌌 全自動星域神諭 (推薦)</button>
+                                <button type="button" onclick="quickInsertMaster('🛡️ 零一 · 白帽資安防禦 (白帽滲透審計 / 零信任 / 逆向防護 / 邊界審計)')" class="chip-selectable text-xs px-2 py-0.5 rounded-lg bg-white dark:bg-stone-800 border border-slate-200 dark:border-stone-700 text-slate-700 dark:text-stone-300 hover:border-amber-400">🛡️ 零一 · 白帽防禦</button>
+                                <button type="button" onclick="quickInsertMaster('🎮 狀態機與架構骨架 (橫向卷軸/AABB碰撞/FSM狀態流轉/馬力歐模式)')" class="chip-selectable text-xs px-2 py-0.5 rounded-lg bg-white dark:bg-stone-800 border border-slate-200 dark:border-stone-700 text-slate-700 dark:text-stone-300 hover:border-amber-400">🎮 狀態機與架構骨架</button>
+                                <button type="button" onclick="quickInsertMaster('📐 萬用防偏航規範 (骨架優先 / 嚴格紅線 / 因果錨定)')" class="chip-selectable text-xs px-2 py-0.5 rounded-lg bg-white dark:bg-stone-800 border border-slate-200 dark:border-stone-700 text-slate-700 dark:text-stone-300 hover:border-amber-400">📐 萬用防偏航規範</button>
+                                <button type="button" onclick="quickInsertMaster('🏆 遊戲生產級全景閉環 (身分/關卡/接關/計分/FSM/防偷懶)')" class="chip-selectable text-xs px-2 py-0.5 rounded-lg bg-white dark:bg-stone-800 border border-slate-200 dark:border-stone-700 text-slate-700 dark:text-stone-300 hover:border-amber-400">🏆 遊戲生產級閉環</button>
+                                <button type="button" onclick="quickInsertMaster('🏢 企業系統生產級閉環 (鑑權/CRUD/審計日誌/容錯機制)')" class="chip-selectable text-xs px-2 py-0.5 rounded-lg bg-white dark:bg-stone-800 border border-slate-200 dark:border-stone-700 text-slate-700 dark:text-stone-300 hover:border-amber-400">🏢 企業系統閉環</button>
+                                <button type="button" onclick="quickInsertMaster('🧠 演算法與量化完備閉環 (形式化/邊界極值/複雜度/風控)')" class="chip-selectable text-xs px-2 py-0.5 rounded-lg bg-white dark:bg-stone-800 border border-slate-200 dark:border-stone-700 text-slate-700 dark:text-stone-300 hover:border-amber-400">🧠 演算法完備閉環</button>
                                 <button type="button" onclick="quickInsertMaster('🚀 航太與天文宇宙學 (齊奧爾科夫斯基 / 馮·布朗 / 卡爾·薩根)')" class="chip-selectable text-xs px-2 py-0.5 rounded-lg bg-white dark:bg-stone-800 border border-slate-200 dark:border-stone-700 text-slate-700 dark:text-stone-300 hover:border-amber-400">🚀 航太與深空推進</button>
                                 <button type="button" onclick="quickInsertMaster('🧬 合成生物與現代遺傳 (珍妮佛·杜德納 / 薛丁格 / 達爾文)')" class="chip-selectable text-xs px-2 py-0.5 rounded-lg bg-white dark:bg-stone-800 border border-slate-200 dark:border-stone-700 text-slate-700 dark:text-stone-300 hover:border-amber-400">🧬 基因編輯與合成生物</button>
                                 <button type="button" onclick="quickInsertMaster('💻 量子運算與前沿架構 (理查·費曼 / 艾倫·圖靈 / 馮·紐曼)')" class="chip-selectable text-xs px-2 py-0.5 rounded-lg bg-white dark:bg-stone-800 border border-slate-200 dark:border-stone-700 text-slate-700 dark:text-stone-300 hover:border-amber-400">💻 量子計算與極限架構</button>
@@ -533,6 +542,29 @@
                                 <svg class="w-3.5 h-3.5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
                                 <span>一鍵複製 Prompt</span>
                             </button>
+
+                            <!-- 多端規則匯出選單 -->
+                            <div class="relative inline-block text-left" id="exportDropdownContainer">
+                                <button type="button" onclick="toggleExportMenu()" class="px-2.5 py-1.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white text-xs font-bold transition flex items-center gap-1 shadow-sm" title="一鍵匯出為 Cursor / Claude / Gemini / JSON 等多端專案規格檔案">
+                                    <span>📥 匯出規則 ▾</span>
+                                </button>
+                                <div id="exportMenu" class="hidden absolute right-0 mt-1 w-44 rounded-xl bg-white dark:bg-stone-800 shadow-xl border border-slate-200 dark:border-stone-700 py-1.5 z-50 text-xs">
+                                    <button type="button" onclick="exportSystemRule('cursor'); toggleExportMenu();" class="w-full text-left px-3 py-1.5 hover:bg-amber-50 dark:hover:bg-stone-700 text-slate-700 dark:text-stone-200 flex items-center gap-2">
+                                        <span>📄</span> <span>.cursorrules</span>
+                                    </button>
+                                    <button type="button" onclick="exportSystemRule('claude'); toggleExportMenu();" class="w-full text-left px-3 py-1.5 hover:bg-amber-50 dark:hover:bg-stone-700 text-slate-700 dark:text-stone-200 flex items-center gap-2">
+                                        <span>📑</span> <span>CLAUDE.md</span>
+                                    </button>
+                                    <button type="button" onclick="exportSystemRule('gemini'); toggleExportMenu();" class="w-full text-left px-3 py-1.5 hover:bg-amber-50 dark:hover:bg-stone-700 text-slate-700 dark:text-stone-200 flex items-center gap-2">
+                                        <span>🪐</span> <span>GEMINI.md</span>
+                                    </button>
+                                    <div class="border-t border-slate-100 dark:border-stone-700 my-1"></div>
+                                    <button type="button" onclick="exportSystemRule('json'); toggleExportMenu();" class="w-full text-left px-3 py-1.5 hover:bg-amber-50 dark:hover:bg-stone-700 text-slate-700 dark:text-stone-200 flex items-center gap-2">
+                                        <span>📦</span> <span>JSON Payload</span>
+                                    </button>
+                                </div>
+                            </div>
+
                             <button onclick="downloadAsMarkdown()" class="p-1.5 rounded-xl bg-white dark:bg-stone-800 border border-slate-200 dark:border-stone-700 hover:border-amber-400 text-slate-600 dark:text-stone-300 transition shadow-sm" title="下載 .md 報告檔案">
                                 <svg class="w-4 h-4 text-slate-500 dark:text-stone-400 hover:text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                             </button>
