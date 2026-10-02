@@ -343,10 +343,14 @@
                                 <h2 class="text-lg font-bold text-slate-800 dark:text-stone-100 flex items-center gap-2">
                                     <span>💡 萬相需求輸入與跨界意圖解析區</span>
                                 </h2>
+                                <div id="domainBadge" class="hidden text-xs font-semibold px-2.5 py-0.5 rounded-full border transition-all duration-300"></div>
                             </div>
                             <p class="text-xs text-slate-500 dark:text-stone-400 mt-0.5">無論何種領域，系統將作為全知中介，搜尋學術文獻與時代典範，召喚相應宗師淬煉為 AI 終極指令</p>
                         </div>
                         <div class="flex items-center gap-1.5">
+                            <button type="button" onclick="openMineNavigatorModal()" class="text-xs font-semibold text-emerald-700 dark:text-emerald-300 bg-emerald-500/15 hover:bg-emerald-500/25 px-2.5 py-1 rounded-lg border border-emerald-500/30 transition flex items-center gap-1" title="打開探礦導航，取得頂級開源網址與精準搜尋詞，供指揮官拓荒後丟回逆向提煉">
+                                <span>🧭 探礦導航</span>
+                            </button>
                             <button type="button" onclick="insertUniversalAntiDriftTemplate()" class="text-xs font-semibold text-indigo-700 dark:text-indigo-300 bg-indigo-500/15 hover:bg-indigo-500/25 px-2.5 py-1 rounded-lg border border-indigo-500/30 transition flex items-center gap-1" title="載入指揮官萬用防偏航模板（骨架優先、嚴格紅線、因果拆解 If-Then）">
                                 <span>🛡️ 萬用防偏航模板</span>
                             </button>
@@ -526,6 +530,9 @@
                             <button onclick="switchViewTab('prompt-only')" id="tab-prompt-only" class="px-3 py-1 rounded-lg text-xs font-medium transition text-slate-600 dark:text-stone-400 hover:text-amber-500">
                                 📜 終極機讀 System Prompt
                             </button>
+                            <button onclick="switchViewTab('diagram')" id="tab-diagram" class="px-3 py-1 rounded-lg text-xs font-medium transition text-slate-600 dark:text-stone-400 hover:text-amber-500">
+                                📊 架構視覺配圖
+                            </button>
                             <button onclick="switchViewTab('raw')" id="tab-raw" class="px-3 py-1 rounded-lg text-xs font-medium transition text-slate-600 dark:text-stone-400 hover:text-amber-500">
                                 📝 原始 Markdown
                             </button>
@@ -557,6 +564,15 @@
                                     </button>
                                     <button type="button" onclick="exportSystemRule('gemini'); toggleExportMenu();" class="w-full text-left px-3 py-1.5 hover:bg-amber-50 dark:hover:bg-stone-700 text-slate-700 dark:text-stone-200 flex items-center gap-2">
                                         <span>🪐</span> <span>GEMINI.md</span>
+                                    </button>
+                                    <button type="button" onclick="exportSystemRule('skill'); toggleExportMenu();" class="w-full text-left px-3 py-1.5 hover:bg-amber-50 dark:hover:bg-stone-700 text-slate-700 dark:text-stone-200 flex items-center gap-2">
+                                        <span>🧠</span> <span>SKILL.md (Agent)</span>
+                                    </button>
+                                    <button type="button" onclick="exportSystemRule('mdx'); toggleExportMenu();" class="w-full text-left px-3 py-1.5 hover:bg-amber-50 dark:hover:bg-stone-700 text-slate-700 dark:text-stone-200 flex items-center gap-2">
+                                        <span>⚓</span> <span>AgentDock MDX</span>
+                                    </button>
+                                    <button type="button" onclick="exportSystemRule('diagram'); toggleExportMenu();" class="w-full text-left px-3 py-1.5 hover:bg-amber-50 dark:hover:bg-stone-700 text-slate-700 dark:text-stone-200 flex items-center gap-2">
+                                        <span>🎨</span> <span>學術配圖 Prompt</span>
                                     </button>
                                     <div class="border-t border-slate-100 dark:border-stone-700 my-1"></div>
                                     <button type="button" onclick="exportSystemRule('json'); toggleExportMenu();" class="w-full text-left px-3 py-1.5 hover:bg-amber-50 dark:hover:bg-stone-700 text-slate-700 dark:text-stone-200 flex items-center gap-2">
@@ -702,6 +718,30 @@
                                 <div class="relative bg-slate-900 rounded-xl p-4 border border-slate-800 text-slate-100 font-mono text-xs leading-relaxed overflow-x-auto selection:bg-amber-500/40">
                                     <pre id="stage3CodeBlock" class="whitespace-pre-wrap font-mono"></pre>
                                 </div>
+
+                                <!-- AgentDock 互動變數即時填空器 (Live Variable Fill-in) -->
+                                <div id="variableInspectorCard" class="hidden mt-3 bg-gradient-to-br from-amber-500/10 via-orange-500/5 to-amber-500/10 rounded-xl p-3.5 border border-amber-500/30 shadow-sm">
+                                    <div class="flex items-center justify-between mb-2.5 pb-2 border-b border-amber-500/20">
+                                        <div class="flex items-center gap-1.5">
+                                            <span class="text-base">🧩</span>
+                                            <h4 class="text-xs font-bold text-amber-900 dark:text-amber-300">
+                                                AgentDock 互動變數即時填空器 (Live Variable Fill-in)
+                                            </h4>
+                                        </div>
+                                        <button type="button" onclick="copySubstitutedPrompt()" class="px-2.5 py-1 rounded-lg bg-amber-500 hover:bg-amber-400 text-white text-xs font-bold transition shadow-sm flex items-center gap-1">
+                                            <span>📋 複製代入變數之 Prompt</span>
+                                        </button>
+                                    </div>
+                                    <div id="variableFieldsContainer" class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs mb-2.5">
+                                        <!-- 動態渲染變數輸入框或下拉選單 -->
+                                    </div>
+                                    <div class="text-[11px] text-slate-500 dark:text-stone-400 flex items-center justify-between flex-wrap gap-2 pt-1 border-t border-amber-500/15">
+                                        <span>語法支援：<code>[VAR]</code> (必填)、<code>[VAR?]</code> (選填)、<code>[VAR:select:A,B]</code> (多選)</span>
+                                        <button type="button" onclick="autoParameterizeCurrentPrompt()" class="text-amber-600 dark:text-amber-400 font-semibold hover:underline">
+                                            ⚡ 一鍵自動萃取變數模板
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
 
@@ -727,6 +767,42 @@
                         <!-- 狀態 3C：原始 Markdown 視圖 -->
                         <div id="viewRawMarkdown" class="hidden markdown-content text-xs text-slate-800 dark:text-stone-200 p-4 leading-relaxed">
                             <!-- 動態填入 marked 解析後的完整 markdown -->
+                        </div>
+
+                        <!-- 狀態 3D：架構配圖與 Mermaid 專用視圖 (Diagram & Figure View) -->
+                        <div id="viewDiagram" class="hidden space-y-4 pb-6">
+                            <!-- Mermaid 架構圖區塊 -->
+                            <div class="bg-white dark:bg-stone-900 rounded-2xl p-4 border border-slate-200 dark:border-stone-800 shadow-sm">
+                                <div class="flex items-center justify-between mb-3 pb-2 border-b border-slate-100 dark:border-stone-800">
+                                    <h4 class="text-xs font-bold text-slate-800 dark:text-stone-200 flex items-center gap-1.5">
+                                        <span>📊</span> 系統視覺拓撲與狀態機 (Mermaid Diagram)
+                                    </h4>
+                                    <button onclick="copyMermaidCode()" class="px-2.5 py-1 rounded-lg bg-indigo-500/15 hover:bg-indigo-500/25 text-indigo-700 dark:text-indigo-300 text-xs font-bold transition flex items-center gap-1 border border-indigo-500/30">
+                                        <span>📋 複製 Mermaid 代碼</span>
+                                    </button>
+                                </div>
+                                <div class="bg-slate-900 rounded-xl p-4 text-emerald-400 font-mono text-xs overflow-x-auto">
+                                    <pre id="diagramMermaidCode" class="whitespace-pre-wrap"></pre>
+                                </div>
+                            </div>
+
+                            <!-- 學術配圖 Prompt 區塊 (LigphiDonk 規範) -->
+                            <div class="bg-white dark:bg-stone-900 rounded-2xl p-4 border border-slate-200 dark:border-stone-800 shadow-sm">
+                                <div class="flex items-center justify-between mb-3 pb-2 border-b border-slate-100 dark:border-stone-800">
+                                    <h4 class="text-xs font-bold text-slate-800 dark:text-stone-200 flex items-center gap-1.5">
+                                        <span>🎨</span> AI 繪圖專用學術/架構配圖 Prompt (Academic Figure Standard)
+                                    </h4>
+                                    <button onclick="copyAcademicFigurePrompt()" class="px-2.5 py-1 rounded-lg bg-purple-500/15 hover:bg-purple-500/25 text-purple-700 dark:text-purple-300 text-xs font-bold transition flex items-center gap-1 border border-purple-500/30">
+                                        <span>🎨 複製繪圖 Prompt</span>
+                                    </button>
+                                </div>
+                                <div class="p-3 bg-purple-50/50 dark:bg-purple-950/20 rounded-xl border border-purple-200 dark:border-purple-800/40 text-[11px] text-purple-900 dark:text-purple-300 mb-3">
+                                    💡 <strong>頂會標準注入</strong>：採用白底留白排版、Okabe-Ito 色盲友好配色，高對比無幻覺模組。可直接貼入 Midjourney、DALL-E 3、Gemini 或 Imagen 產出高清架構圖。
+                                </div>
+                                <div class="bg-slate-900 rounded-xl p-4 text-slate-200 font-mono text-xs overflow-x-auto">
+                                    <pre id="diagramAcademicPrompt" class="whitespace-pre-wrap"></pre>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </section>
@@ -1030,6 +1106,138 @@
                 </button>
                 <button onclick="closeSystemInspectionModal()" class="px-5 py-2 rounded-xl bg-slate-100 dark:bg-stone-800 hover:bg-slate-200 dark:hover:bg-stone-700 text-slate-700 dark:text-stone-200 text-xs font-semibold transition">
                     關閉
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================== -->
+    <!-- 視窗 5：萬相探礦導航與圖書館員導引 (Mine Navigator Modal) -->
+    <!-- ============================================== -->
+    <div id="mineNavigatorModal" class="hidden fixed inset-0 bg-slate-950/60 backdrop-blur-sm flex items-center justify-center p-4 z-50 animate-fadeIn">
+        <div class="bg-white dark:bg-stone-900 rounded-2xl max-w-2xl w-full p-6 shadow-2xl border border-slate-200 dark:border-stone-800 flex flex-col max-h-[90vh]">
+            <div class="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-stone-800 shrink-0">
+                <div class="flex items-center gap-2.5">
+                    <span class="text-xl">🧭</span>
+                    <div>
+                        <h3 class="text-base font-bold text-slate-800 dark:text-stone-100">萬相探礦導航 · 圖書館員中介指南</h3>
+                        <p class="text-xs text-slate-500 dark:text-stone-400">提出想法 ➔ 指引礦場與精準關鍵字 ➔ 前往探礦 ➔ 丟回網址 ➔ 零一白帽逆向提煉</p>
+                    </div>
+                </div>
+                <button onclick="closeMineNavigatorModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-stone-200 text-lg p-1">✕</button>
+            </div>
+
+            <div class="py-4 space-y-4 overflow-y-auto flex-1">
+                <!-- 探礦關鍵字設定區 -->
+                <div class="p-3.5 rounded-xl bg-slate-50 dark:bg-stone-800/60 border border-slate-200 dark:border-stone-700">
+                    <label class="block text-xs font-bold text-slate-700 dark:text-stone-300 mb-1.5 flex items-center justify-between">
+                        <span>🎯 當前探礦意圖 / 關鍵詞（可即時修改）：</span>
+                        <button type="button" onclick="copyMiningKeyword()" class="text-[11px] text-emerald-600 dark:text-emerald-400 font-semibold hover:underline flex items-center gap-1">
+                            📋 複製關鍵字
+                        </button>
+                    </label>
+                    <div class="flex items-center gap-2">
+                        <input type="text" id="mineQueryInput" oninput="updateMineLinks()" class="w-full text-xs px-3 py-2 rounded-lg bg-white dark:bg-stone-900 border border-slate-200 dark:border-stone-700 focus:outline-none focus:border-emerald-500 text-slate-800 dark:text-stone-100 font-mono" placeholder="輸入想探礦的主題、技術或機制...">
+                    </div>
+                    <div class="mt-2 text-[11px] text-slate-500 dark:text-stone-400 flex items-center gap-1.5">
+                        <span>當前目標關鍵詞：</span>
+                        <span id="mineActiveKeyword" class="font-bold text-emerald-600 dark:text-emerald-400 font-mono"></span>
+                    </div>
+                </div>
+
+                <!-- 六大頂級礦場直達傳送門 -->
+                <div>
+                    <h4 class="text-xs font-bold text-slate-700 dark:text-stone-300 mb-2 flex items-center gap-1">
+                        <span>⛏️ 頂級開源與學術礦場（一鍵直達搜尋頁）：</span>
+                    </h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                        <a id="mineGithubStarsLink" href="#" target="_blank" class="p-3 rounded-xl border border-slate-200 dark:border-stone-700 hover:border-purple-400 bg-white dark:bg-stone-800/80 hover:bg-purple-50/50 dark:hover:bg-purple-950/20 transition group flex flex-col justify-between">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-xs font-bold text-purple-700 dark:text-purple-300 flex items-center gap-1.5">
+                                    <span>🐙</span> GitHub Top Stars (排名第一)
+                                </span>
+                                <span class="text-[10px] text-purple-500 font-mono">Stars &gt; 50 ↗</span>
+                            </div>
+                            <p class="text-[11px] text-slate-500 dark:text-stone-400 leading-snug">搜尋全球頂級開源專案，按星標降序排列，探勘最權威實踐。</p>
+                        </a>
+
+                        <a id="mineGithubAwesomeLink" href="#" target="_blank" class="p-3 rounded-xl border border-slate-200 dark:border-stone-700 hover:border-amber-400 bg-white dark:bg-stone-800/80 hover:bg-amber-50/50 dark:hover:bg-amber-950/20 transition group flex flex-col justify-between">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-xs font-bold text-amber-700 dark:text-amber-300 flex items-center gap-1.5">
+                                    <span>⭐</span> Awesome 系列專題合集
+                                </span>
+                                <span class="text-[10px] text-amber-500 font-mono">Curated ↗</span>
+                            </div>
+                            <p class="text-[11px] text-slate-500 dark:text-stone-400 leading-snug">全球工程師維護的高質量精選資源清單，快速摸清領域全景。</p>
+                        </a>
+
+                        <a id="mineHuggingfaceLink" href="#" target="_blank" class="p-3 rounded-xl border border-slate-200 dark:border-stone-700 hover:border-yellow-400 bg-white dark:bg-stone-800/80 hover:bg-yellow-50/50 dark:hover:bg-yellow-950/20 transition group flex flex-col justify-between">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-xs font-bold text-yellow-700 dark:text-yellow-300 flex items-center gap-1.5">
+                                    <span>🤗</span> Hugging Face 模型與 Space
+                                </span>
+                                <span class="text-[10px] text-yellow-500 font-mono">Models & Spaces ↗</span>
+                            </div>
+                            <p class="text-[11px] text-slate-500 dark:text-stone-400 leading-snug">探索開源社群實作之 Demo、提示詞與端點架構。</p>
+                        </a>
+
+                        <a id="minePapersWithCodeLink" href="#" target="_blank" class="p-3 rounded-xl border border-slate-200 dark:border-stone-700 hover:border-blue-400 bg-white dark:bg-stone-800/80 hover:bg-blue-50/50 dark:hover:bg-blue-950/20 transition group flex flex-col justify-between">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-xs font-bold text-blue-700 dark:text-blue-300 flex items-center gap-1.5">
+                                    <span>📊</span> Papers With Code
+                                </span>
+                                <span class="text-[10px] text-blue-500 font-mono">SOTA Benchmark ↗</span>
+                            </div>
+                            <p class="text-[11px] text-slate-500 dark:text-stone-400 leading-snug">前沿 SOTA 論文與開源 Code 對照，摸清行業最新基準標竿。</p>
+                        </a>
+
+                        <a id="mineArxivLink" href="#" target="_blank" class="p-3 rounded-xl border border-slate-200 dark:border-stone-700 hover:border-rose-400 bg-white dark:bg-stone-800/80 hover:bg-rose-50/50 dark:hover:bg-rose-950/20 transition group flex flex-col justify-between">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-xs font-bold text-rose-700 dark:text-rose-300 flex items-center gap-1.5">
+                                    <span>📄</span> arXiv 科研論文預印本
+                                </span>
+                                <span class="text-[10px] text-rose-500 font-mono">Research ↗</span>
+                            </div>
+                            <p class="text-[11px] text-slate-500 dark:text-stone-400 leading-snug">學術第一手未發表或最新發表論文，汲取最深層數學與方法論。</p>
+                        </a>
+
+                        <a id="mineGoogleScholarLink" href="#" target="_blank" class="p-3 rounded-xl border border-slate-200 dark:border-stone-700 hover:border-emerald-400 bg-white dark:bg-stone-800/80 hover:bg-emerald-50/50 dark:hover:bg-emerald-950/20 transition group flex flex-col justify-between">
+                            <div class="flex items-center justify-between mb-1">
+                                <span class="text-xs font-bold text-emerald-700 dark:text-emerald-300 flex items-center gap-1.5">
+                                    <span>🔍</span> Google Scholar 學術搜尋
+                                </span>
+                                <span class="text-[10px] text-emerald-500 font-mono">Academic ↗</span>
+                            </div>
+                            <p class="text-[11px] text-slate-500 dark:text-stone-400 leading-snug">跨學科權威被引用文獻檢索，確認理論背景與先驗基礎。</p>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- 逆向提煉閉環工作流引導卡 -->
+                <div class="p-3.5 rounded-xl bg-gradient-to-br from-indigo-50/80 to-purple-50/80 dark:from-indigo-950/30 dark:to-purple-950/30 border border-indigo-200/80 dark:border-indigo-800/60">
+                    <h4 class="text-xs font-bold text-indigo-900 dark:text-indigo-200 mb-2 flex items-center gap-1.5">
+                        <span>🔄</span> 探礦與白帽逆向提煉閉環流程 (Concierge Loop)
+                    </h4>
+                    <div class="text-[11px] text-indigo-800/90 dark:text-indigo-300 space-y-1.5 leading-relaxed">
+                        <div class="flex items-start gap-1.5">
+                            <span class="font-bold text-indigo-600 dark:text-indigo-400">1.</span>
+                            <span><strong>指揮官出巡探礦</strong>：點選上方任一傳送門（例如 GitHub Top Stars），尋找最具啟發性的專案或功能代碼。</span>
+                        </div>
+                        <div class="flex items-start gap-1.5">
+                            <span class="font-bold text-indigo-600 dark:text-indigo-400">2.</span>
+                            <span><strong>回傳坐標網址</strong>：複製專案網址（如 <code>github.com/...</code>）或關鍵代碼片段，貼回本系統輸入框或發給零一。</span>
+                        </div>
+                        <div class="flex items-start gap-1.5">
+                            <span class="font-bold text-indigo-600 dark:text-indigo-400">3.</span>
+                            <span><strong>零一白帽逆向工程</strong>：零一將進行解構提煉，吸納其元素精髓（狀態機、元素庫、防禦策略），無縫注入指揮官的專案法典！</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex items-center justify-end pt-3 border-t border-slate-100 dark:border-stone-800 shrink-0">
+                <button onclick="closeMineNavigatorModal()" class="px-5 py-2 rounded-xl bg-slate-100 dark:bg-stone-800 hover:bg-slate-200 dark:hover:bg-stone-700 text-slate-700 dark:text-stone-200 text-xs font-semibold transition">
+                    完成導航 / 返回主視窗
                 </button>
             </div>
         </div>

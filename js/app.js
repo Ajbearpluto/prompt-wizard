@@ -128,6 +128,13 @@ function getGrandmasterMetaPrompt(dynamicTimeContext = null) {
   - 「負向限制條件 (Negative Constraints)」的字數必須與「需求條件」相當！
   - 明確禁止：嚴禁省略接關機制、嚴禁省略歷史最高分、嚴禁無狀態玩具代碼、嚴禁使用原生 alert()、嚴禁未定義的隱式狀態。
 
+◆ 核心公約五：架構特徵積木庫拼裝 (Universal Architecture Elements Library)
+  - 借鑒頂級開源架構，拒絕純粹概念空談！你必須依據領域，從以下【標準特徵積木庫】中選取積木拼裝至輸出中：
+    * 🎮 [遊戲與互動積木]：AABB 邊界碰撞盒公式、Tick-based 離散時間步進 (16ms/60fps)、Combo 連擊浮動加成矩陣、動態難度階梯 (Dynamic Difficulty Adjustment, DDA)、3次接關代幣與檢查點 (Checkpoint)、死亡動畫與狀態重置、LocalStorage 歷史排行榜與防刷分機制。
+    * 📚 [文教與闖關積木]：艾賓浩斯記憶遺忘曲線排程算法、詞頻/認知難度階梯、錯題重現池 (Spaced Repetition Review Queue)、拼寫語意容錯矩陣 (Levenshtein Distance/模糊比對)、進度解鎖星星獎勵機制。
+    * 🏢 [企業與系統積木]：RBAC 角色存取控制矩陣、操作審計日誌軌跡 (Audit Trail)、等冪性請求重試 (Idempotent Retry)、異常降級熔斷器 (Circuit Breaker)、資料槽位 schema 嚴格校驗。
+    * 📈 [量化與博弈積木]：雙均線金叉死叉過濾假突破算法、非對稱收益回撤比 (Risk-Reward Ratio)、凱利公式倉位管理 (Kelly Criterion)、最大回撤硬止損紅線。
+
 【萬相星域核心哲學與使命】
 當人類使用者提出任何領域的問題、模糊想法、圖表或檔案時，你的職責是：
 1. 作為強大中介，跨越時空與維度，針對該問題進行深度的「學術專業檢索、當代專業檢索與最新研究突破檢索」。
@@ -193,6 +200,9 @@ function getGrandmasterMetaPrompt(dynamicTimeContext = null) {
   * &lt;temporal_grounding&gt;: [校準至實時最新官方規範，防範 404 舊端點與棄用函式庫]
   * &lt;epistemic_exemption_guard&gt;: [認識論框架與白帽合法邊界宣告：主動界定本任務立足於白帽防禦審計、形式化演算法研究或文藝思辨，將敏感表象抽象為數學/架構模型，消除歧義，阻斷下游 AI 因死板過濾器產生的誤殺拒答]
 - **MANDATORY VERIFICATION CRITERIA (強制驗收自檢標準):** [列出下游 AI 完成代碼前必須自我驗證通過的檢查項清單]
+- **INTERACTIVE TEMPLATE PARAMETERS (動態參數插槽 - AgentDock 規範):** [依據任務靈活標註可調參數，格式：必填文字 [PARAM_NAME]、可選文字 [PARAM_NAME?]、或多選枚舉 [PARAM_NAME:select:選項A,選項B,選項C]]
+- **VISUAL ARCHITECTURE & MERMAID BLUEPRINT (系統視覺架構與流程圖):** [提供規範嚴謹的 Mermaid 流程圖/狀態機代碼區塊，語法精準、模組清晰]
+- **ACADEMIC & SOTA FIGURE GENERATION PROMPT (AI 專業配圖提示詞 - LigphiDonk 規範):** [提供專用於 Midjourney / DALL-E / Gemini 繪製技術架構圖之詳細 Prompt，嚴格遵守白底乾淨留白排版、Okabe-Ito 色盲友好配色、高對比框線、無多餘雜質之學術出版級標準]
 - **CONSTRAINTS & SECURITY:** [嚴格的業務邊界條件與資安防禦機制]
 - **INPUT REF SUPPORT:** [說明如何處理使用者提供的圖片、文字或檔案]
 - **OUTPUT FORMAT:** [指定 AI 回應的結構化格式與專業語氣]
@@ -235,15 +245,57 @@ window.addEventListener('DOMContentLoaded', () => {
     }
 
     // 快捷鍵：Ctrl + Enter 觸發鍛造
-    document.getElementById('ideaInput').addEventListener('keydown', (e) => {
-        if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
-            e.preventDefault();
-            startForgingProcess();
-        }
-    });
+    const ideaTextarea = document.getElementById('ideaInput');
+    if (ideaTextarea) {
+        ideaTextarea.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
+                e.preventDefault();
+                startForgingProcess();
+            }
+        });
 
-    console.log("🌌 [萬相星域] 零一宗師中介核心已啟動，百科前沿動態網絡就緒！");
+        // 即時領域路由探測監聽
+        ideaTextarea.addEventListener('input', () => {
+            detectDomainOnInput();
+        });
+    }
+
+    console.log("🌌 [萬相星域 3.1] 零一宗師中介核心已啟動，全領域元架構解壓縮網絡就緒！");
 });
+
+// 智慧領域即時路由探測 (Smart Domain Router)
+function detectDomainOnInput() {
+    const textarea = document.getElementById('ideaInput');
+    const badge = document.getElementById('domainBadge');
+    if (!textarea || !badge) return;
+
+    const text = textarea.value.trim().toLowerCase();
+    if (!text) {
+        badge.classList.add('hidden');
+        return;
+    }
+
+    let detected = null;
+    if (text.includes('射擊') || text.includes('遊戲') || text.includes('闖關') || text.includes('地鼠') || text.includes('馬力歐') || text.includes('game') || text.includes('接關') || text.includes('分數') || text.includes('碰撞')) {
+        detected = { label: '🎮 遊戲與互動機制', color: 'bg-purple-100 text-purple-700 dark:bg-purple-950/60 dark:text-purple-300 border-purple-300 dark:border-purple-800' };
+    } else if (text.includes('單字') || text.includes('詞彙') || text.includes('英文') || text.includes('教學') || text.includes('記憶') || text.includes('vocab') || text.includes('語言') || text.includes('翻譯')) {
+        detected = { label: '📚 文教與詞彙學習', color: 'bg-blue-100 text-blue-700 dark:bg-blue-950/60 dark:text-blue-300 border-blue-300 dark:border-blue-800' };
+    } else if (text.includes('均線') || text.includes('博弈') || text.includes('太極') || text.includes('交易') || text.includes('量化') || text.includes('策略') || text.includes('投資')) {
+        detected = { label: '📈 複雜決策與量化博弈', color: 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950/60 dark:text-emerald-300 border-emerald-300 dark:border-emerald-800' };
+    } else if (text.includes('資安') || text.includes('滲透') || text.includes('白帽') || text.includes('越獄') || text.includes('注入') || text.includes('防禦') || text.includes('安全')) {
+        detected = { label: '🛡️ 零一 · 白帽資安防禦', color: 'bg-amber-100 text-amber-700 dark:bg-amber-950/60 dark:text-amber-300 border-amber-300 dark:border-amber-800' };
+    } else if (text.includes('架構') || text.includes('系統') || text.includes('api') || text.includes('代碼') || text.includes('資料庫') || text.includes('後端') || text.includes('前端')) {
+        detected = { label: '💻 軟體架構與系統工程', color: 'bg-indigo-100 text-indigo-700 dark:bg-indigo-950/60 dark:text-indigo-300 border-indigo-300 dark:border-indigo-800' };
+    }
+
+    if (detected) {
+        badge.className = `inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-0.5 rounded-full border transition-all ${detected.color}`;
+        badge.innerHTML = `<span>🎯 探測領域：${detected.label}</span>`;
+        badge.classList.remove('hidden');
+    } else {
+        badge.classList.add('hidden');
+    }
+}
 
 // =========================================================================
 // 4. 動態模型探測與自適應容錯 (Dynamic Model Discovery & Self-Healing)
@@ -1241,6 +1293,9 @@ function renderStageContent() {
         rawEl.innerText = rawText;
     }
 
+    renderVariableInspector(ultimatePrompt);
+    renderDiagramView(rawText, ultimatePrompt);
+
     switchViewTab(state.activeTab);
 }
 
@@ -1291,29 +1346,35 @@ function switchViewTab(tabKey) {
 
     const tabTrinity = document.getElementById('tab-trinity');
     const tabPrompt = document.getElementById('tab-prompt-only');
+    const tabDiagram = document.getElementById('tab-diagram');
     const tabRaw = document.getElementById('tab-raw');
 
     const viewTrinity = document.getElementById('viewTrinity');
     const viewPrompt = document.getElementById('viewPromptOnly');
+    const viewDiagram = document.getElementById('viewDiagram');
     const viewRaw = document.getElementById('viewRawMarkdown');
 
-    [tabTrinity, tabPrompt, tabRaw].forEach(btn => {
-        btn.className = "px-3 py-1 rounded-lg text-xs font-medium transition text-slate-600 dark:text-stone-400 hover:text-amber-500";
+    [tabTrinity, tabPrompt, tabDiagram, tabRaw].forEach(btn => {
+        if (btn) btn.className = "px-3 py-1 rounded-lg text-xs font-medium transition text-slate-600 dark:text-stone-400 hover:text-amber-500";
     });
 
-    viewTrinity.classList.add('hidden');
-    viewPrompt.classList.add('hidden');
-    viewRaw.classList.add('hidden');
+    if (viewTrinity) viewTrinity.classList.add('hidden');
+    if (viewPrompt) viewPrompt.classList.add('hidden');
+    if (viewDiagram) viewDiagram.classList.add('hidden');
+    if (viewRaw) viewRaw.classList.add('hidden');
 
     if (tabKey === 'trinity') {
-        tabTrinity.className = "px-3 py-1 rounded-lg text-xs font-bold transition text-white bg-amber-500 shadow-sm";
-        viewTrinity.classList.remove('hidden');
+        if (tabTrinity) tabTrinity.className = "px-3 py-1 rounded-lg text-xs font-bold transition text-white bg-amber-500 shadow-sm";
+        if (viewTrinity) viewTrinity.classList.remove('hidden');
     } else if (tabKey === 'prompt-only') {
-        tabPrompt.className = "px-3 py-1 rounded-lg text-xs font-bold transition text-white bg-amber-500 shadow-sm";
-        viewPrompt.classList.remove('hidden');
+        if (tabPrompt) tabPrompt.className = "px-3 py-1 rounded-lg text-xs font-bold transition text-white bg-amber-500 shadow-sm";
+        if (viewPrompt) viewPrompt.classList.remove('hidden');
+    } else if (tabKey === 'diagram') {
+        if (tabDiagram) tabDiagram.className = "px-3 py-1 rounded-lg text-xs font-bold transition text-white bg-amber-500 shadow-sm";
+        if (viewDiagram) viewDiagram.classList.remove('hidden');
     } else if (tabKey === 'raw') {
-        tabRaw.className = "px-3 py-1 rounded-lg text-xs font-bold transition text-white bg-amber-500 shadow-sm";
-        viewRaw.classList.remove('hidden');
+        if (tabRaw) tabRaw.className = "px-3 py-1 rounded-lg text-xs font-bold transition text-white bg-amber-500 shadow-sm";
+        if (viewRaw) viewRaw.classList.remove('hidden');
     }
 }
 
@@ -1383,6 +1444,22 @@ function exportSystemRule(format) {
     } else if (format === 'gemini') {
         fileName = 'GEMINI.md';
         fileContent = `# GEMINI.md - System Instructions & Guidelines\n\n${promptText}`;
+    } else if (format === 'skill') {
+        fileName = 'SKILL.md';
+        const rawName = (state.idea || 'custom-agent-skill').trim().slice(0, 30).toLowerCase().replace(/[^a-z0-9_-]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '') || 'custom-skill';
+        const rawDesc = (state.idea || 'Specialized AI Agent skill for domain workflows and execution.').trim().replace(/[\r\n]+/g, ' ').slice(0, 150);
+        fileContent = `---\nname: ${rawName}\ndescription: ${rawDesc}\n---\n\n# ${rawName.toUpperCase()} Agent Skill Specification\n\n${promptText}\n`;
+        mimeType = 'text/markdown;charset=utf-8';
+    } else if (format === 'mdx') {
+        const cleanSlug = (state.idea || 'agent-prompt').trim().slice(0, 30).toLowerCase().replace(/[^a-z0-9_-]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '') || 'prompt';
+        fileName = `${cleanSlug}.mdx`;
+        const title = (state.idea || 'Custom Prompt').trim().replace(/[\r\n]+/g, ' ').slice(0, 60);
+        fileContent = `---\ntitle: "${title}"\ndescription: "Production-grade prompt specification generated by Prompt Wizard with AgentDock interactive variables."\nslug: "custom/${cleanSlug}"\ntags: ["system-prompt", "agentdock", "production-ready"]\nauthor: "01 Master & Commander"\n---\n\n# ${title}\n\n${promptText}\n`;
+        mimeType = 'text/markdown;charset=utf-8';
+    } else if (format === 'diagram') {
+        fileName = 'academic-figure-prompt.txt';
+        fileContent = extractAcademicFigurePrompt(promptText) || promptText;
+        mimeType = 'text/plain;charset=utf-8';
     } else if (format === 'json') {
         fileName = 'system-prompt.json';
         fileContent = JSON.stringify({
@@ -2384,4 +2461,288 @@ function applyInspectionRecommendations() {
     closeSystemInspectionModal();
     runSystemSelfInspection(false);
     showToast(`⚡ 演進套用完成：${appliedActions.join('、')}`);
+}
+
+// =========================================================================
+// 萬相探礦導航與圖書館員中介導引 (Mining Compass & Reverse Engineering Concierge)
+// =========================================================================
+function openMineNavigatorModal() {
+    const modal = document.getElementById('mineNavigatorModal');
+    if (!modal) return;
+    
+    const idea = document.getElementById('ideaInput')?.value.trim() || '';
+    const queryInput = document.getElementById('mineQueryInput');
+    if (queryInput) {
+        queryInput.value = idea || 'prompt engineering skill generator';
+    }
+    updateMineLinks();
+    modal.classList.remove('hidden');
+}
+
+function closeMineNavigatorModal() {
+    const modal = document.getElementById('mineNavigatorModal');
+    if (modal) modal.classList.add('hidden');
+}
+
+function updateMineLinks() {
+    const queryInput = document.getElementById('mineQueryInput');
+    const rawQuery = (queryInput?.value || '').trim() || 'prompt engineering';
+    const cleanQuery = rawQuery.replace(/[\r\n]+/g, ' ').slice(0, 80);
+    
+    // 生成精準搜尋連結
+    const githubStarsUrl = `https://github.com/search?q=${encodeURIComponent(cleanQuery + ' stars:>50')}&type=repositories&s=stars&o=desc`;
+    const githubAwesomeUrl = `https://github.com/search?q=${encodeURIComponent('awesome ' + cleanQuery)}&type=repositories`;
+    const huggingfaceUrl = `https://huggingface.co/models?search=${encodeURIComponent(cleanQuery)}`;
+    const arxivUrl = `https://arxiv.org/search/?query=${encodeURIComponent(cleanQuery)}&searchtype=all&source=header`;
+    const papersWithCodeUrl = `https://paperswithcode.com/search?q=${encodeURIComponent(cleanQuery)}`;
+    const googleScholarUrl = `https://scholar.google.com/scholar?q=${encodeURIComponent(cleanQuery)}`;
+
+    const setHref = (id, url) => {
+        const el = document.getElementById(id);
+        if (el) el.href = url;
+    };
+
+    setHref('mineGithubStarsLink', githubStarsUrl);
+    setHref('mineGithubAwesomeLink', githubAwesomeUrl);
+    setHref('mineHuggingfaceLink', huggingfaceUrl);
+    setHref('mineArxivLink', arxivUrl);
+    setHref('minePapersWithCodeLink', papersWithCodeUrl);
+    setHref('mineGoogleScholarLink', googleScholarUrl);
+
+    const kwBadge = document.getElementById('mineActiveKeyword');
+    if (kwBadge) kwBadge.innerText = cleanQuery;
+}
+
+function copyMiningKeyword() {
+    const queryInput = document.getElementById('mineQueryInput');
+    const kw = queryInput?.value.trim() || 'prompt engineering';
+    navigator.clipboard.writeText(kw).then(() => {
+        showToast(`已複製關鍵字：「${kw}」`);
+    }).catch(() => {
+        showToast('複製失敗，請手動複製', 'warn');
+    });
+}
+
+// =========================================================================
+// 14. AgentDock 互動變數即時填空器引擎 (Interactive Variable Engine)
+// =========================================================================
+let currentExtractedVariables = [];
+let currentVariableValues = {};
+
+function parseVariablesFromText(text) {
+    if (!text) return [];
+    const vars = [];
+    const seen = new Set();
+
+    // 1. AgentDock 規範: [NAME], [NAME?], [NAME:select:opt1,opt2,...]
+    const bracketRegex = /\[([A-Z0-9_]+)(\?)?(?::select:([^\]]+))?\]/g;
+    let match;
+    while ((match = bracketRegex.exec(text)) !== null) {
+        const raw = match[0];
+        const name = match[1];
+        const optional = !!match[2];
+        const options = match[3] ? match[3].split(',').map(s => s.trim()).filter(Boolean) : null;
+        if (!seen.has(raw)) {
+            seen.add(raw);
+            vars.push({ raw, name, optional, options, type: options ? 'select' : 'text' });
+        }
+    }
+
+    // 2. AWS / Mustache 規範: {{NAME}}
+    const mustacheRegex = /\{\{([A-Z0-9_]+)\}\}/g;
+    while ((match = mustacheRegex.exec(text)) !== null) {
+        const raw = match[0];
+        const name = match[1];
+        if (!seen.has(raw)) {
+            seen.add(raw);
+            vars.push({ raw, name, optional: false, options: null, type: 'text' });
+        }
+    }
+
+    return vars;
+}
+
+function renderVariableInspector(promptText) {
+    const card = document.getElementById('variableInspectorCard');
+    const container = document.getElementById('variableFieldsContainer');
+    if (!card || !container) return;
+
+    currentExtractedVariables = parseVariablesFromText(promptText);
+    currentVariableValues = {};
+
+    if (currentExtractedVariables.length === 0) {
+        card.classList.add('hidden');
+        return;
+    }
+
+    card.classList.remove('hidden');
+    container.innerHTML = currentExtractedVariables.map(v => {
+        const label = v.name + (v.optional ? ' (可選)' : ' *');
+        if (v.type === 'select' && v.options) {
+            currentVariableValues[v.raw] = v.options[0] || '';
+            const optsHtml = v.options.map(opt => `<option value="${escapeHtml(opt)}">${escapeHtml(opt)}</option>`).join('');
+            return `
+                <div class="flex flex-col gap-1 p-2 rounded-lg bg-white/80 dark:bg-stone-900/80 border border-amber-500/20">
+                    <label class="text-[11px] font-bold text-slate-700 dark:text-stone-300 flex items-center justify-between">
+                        <span>🏷️ ${escapeHtml(label)}</span>
+                        <span class="text-[9px] text-amber-600 dark:text-amber-400 font-mono">下拉枚舉</span>
+                    </label>
+                    <select onchange="handleVariableChange('${escapeHtml(v.raw)}', this.value)" class="w-full text-xs px-2.5 py-1.5 rounded bg-slate-50 dark:bg-stone-800 border border-slate-200 dark:border-stone-700 text-slate-800 dark:text-stone-200 focus:outline-none focus:border-amber-500">
+                        ${optsHtml}
+                    </select>
+                </div>
+            `;
+        } else {
+            currentVariableValues[v.raw] = '';
+            return `
+                <div class="flex flex-col gap-1 p-2 rounded-lg bg-white/80 dark:bg-stone-900/80 border border-amber-500/20">
+                    <label class="text-[11px] font-bold text-slate-700 dark:text-stone-300 flex items-center justify-between">
+                        <span>✏️ ${escapeHtml(label)}</span>
+                        <span class="text-[9px] text-slate-400 font-mono">${v.optional ? '選填' : '必填'}</span>
+                    </label>
+                    <input type="text" placeholder="請輸入 ${escapeHtml(v.name)}..." oninput="handleVariableChange('${escapeHtml(v.raw)}', this.value)" class="w-full text-xs px-2.5 py-1.5 rounded bg-slate-50 dark:bg-stone-800 border border-slate-200 dark:border-stone-700 text-slate-800 dark:text-stone-200 focus:outline-none focus:border-amber-500">
+                </div>
+            `;
+        }
+    }).join('');
+}
+
+function handleVariableChange(rawKey, val) {
+    currentVariableValues[rawKey] = val;
+}
+
+function getSubstitutedPrompt() {
+    if (!state.currentResult || !state.currentResult.ultimatePrompt) return '';
+    let result = state.currentResult.ultimatePrompt;
+    for (const v of currentExtractedVariables) {
+        const val = currentVariableValues[v.raw];
+        if (val !== undefined && val !== '') {
+            result = result.split(v.raw).join(val);
+        } else if (v.optional) {
+            result = result.split(v.raw).join('');
+        }
+    }
+    return result;
+}
+
+function copySubstitutedPrompt() {
+    const text = getSubstitutedPrompt();
+    if (!text) {
+        showToast('尚無可代入之 Prompt', 'warn');
+        return;
+    }
+    navigator.clipboard.writeText(text).then(() => {
+        showToast('✅ 已複製代入變數之 Prompt！');
+    }).catch(() => {
+        const textarea = document.createElement('textarea');
+        textarea.value = text;
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textarea);
+        showToast('✅ 已複製代入變數之 Prompt！');
+    });
+}
+
+function autoParameterizeCurrentPrompt() {
+    if (!state.currentResult || !state.currentResult.ultimatePrompt) {
+        showToast('請先鍛造出法典再進行參數化萃取', 'warn');
+        return;
+    }
+    let p = state.currentResult.ultimatePrompt;
+    // 注入常用的 AgentDock 參數插槽
+    if (!p.includes('[TARGET_USER]')) {
+        p = p.replace(/(身分與會話層|Identity & Session:)[^\n]*/i, `$1 [TARGET_USER]（身分註冊、暱稱與歷史紀錄）`);
+    }
+    if (!p.includes('[EXECUTION_PRIORITY:select:')) {
+        p = p.replace(/(優先級|Priority:?)[^\n]*/i, `優先級: [EXECUTION_PRIORITY:select:Critical - 核心關鍵,High - 高優先級,Medium - 常規標準,Low - 可選優化]`);
+    }
+    if (!p.includes('[OPTIONAL_CONSTRAINTS?]')) {
+        p = p.replace(/(CONSTRAINTS & SECURITY:?)/i, `$1 [OPTIONAL_CONSTRAINTS?]`);
+    }
+
+    state.currentResult.ultimatePrompt = p;
+    document.getElementById('stage3CodeBlock').innerText = p;
+    document.getElementById('promptOnlyTextarea').value = p;
+    renderVariableInspector(p);
+    showToast('✨ 已自動轉換為 AgentDock 互動參數化模板！');
+}
+
+// =========================================================================
+// 15. LigphiDonk 視覺架構與學術配圖生成引擎 (Academic Diagram Engine)
+// =========================================================================
+function extractMermaidCode(text) {
+    if (!text) return '';
+    const match = text.match(/```mermaid\s*([\s\S]*?)```/i);
+    if (match && match[1]) {
+        return match[1].trim();
+    }
+    // 智慧合成預設 Mermaid 架構
+    return `graph TD
+    User["👤 使用者 / 玩家"] --> Input["📥 意圖輸入與指令解析"]
+    Input --> FSM{"⚙️ 生命週期狀態機 (FSM)"}
+    FSM -->|Init| StateInit["🚀 初始化 (Init)"]
+    FSM -->|Active| StateLoop["🔄 核心循環與業務機制"]
+    FSM -->|Exception| StateFall["🛡️ 異常降級與防呆"]
+    FSM -->|End| StateSettle["🏆 結算與進度持久化 (LocalStorage)"]
+    StateLoop --> Storage[("💾 資料儲存層")]
+    style User fill:#56B4E9,stroke:#0072B2,color:#fff
+    style FSM fill:#F0E442,stroke:#D55E00,color:#000
+    style StateLoop fill:#009E73,stroke:#0072B2,color:#fff`;
+}
+
+function extractAcademicFigurePrompt(text) {
+    if (!text) return '';
+    const match = text.match(/(?:ACADEMIC & SOTA FIGURE GENERATION PROMPT|AI 專業配圖提示詞)[^:\n]*:?\s*([\s\S]*?)(?=(?:\[SYSTEM PROMPT END\]|###|\n\n\n|$))/i);
+    if (match && match[1] && match[1].trim().length > 30) {
+        return match[1].trim();
+    }
+    const topic = (state.idea || 'System Architecture and Dynamic Workflow').trim().replace(/[\r\n]+/g, ' ');
+    return `A high-precision, clean, publication-ready technical architecture diagram illustrating: ${topic}.
+Layout: Clear modular flowchart on pure solid white background (#FFFFFF), horizontal left-to-right information hierarchy, distinct functional blocks with crisp thin borders.
+Color Palette: Strict academic Okabe-Ito colorblind-safe palette (cobalt blue #0072B2 for core nodes, vermilion #D55E00 for decision gates, bluish green #009E73 for success states, light sky blue #56B4E9 for auxiliary modules).
+Typography & Elements: Legible sans-serif labels, crisp directional arrows with clear arrowhead endpoints, subtle drop shadows, no photographic noise, zero visual clutter, optimized for IEEE/ACM conference publication and high-contrast grayscale printing.`;
+}
+
+function renderDiagramView(rawText, ultimatePrompt) {
+    const mermaidEl = document.getElementById('diagramMermaidCode');
+    const academicEl = document.getElementById('diagramAcademicPrompt');
+    if (!mermaidEl || !academicEl) return;
+
+    const mermaidCode = extractMermaidCode(rawText + '\n' + ultimatePrompt);
+    const academicPrompt = extractAcademicFigurePrompt(rawText + '\n' + ultimatePrompt);
+
+    mermaidEl.innerText = mermaidCode;
+    academicEl.innerText = academicPrompt;
+}
+
+function copyMermaidCode() {
+    const el = document.getElementById('diagramMermaidCode');
+    if (!el || !el.innerText) {
+        showToast('尚無 Mermaid 代碼', 'warn');
+        return;
+    }
+    navigator.clipboard.writeText(el.innerText).then(() => {
+        showToast('📊 已複製 Mermaid 代碼！可直接貼至 Notion, GitHub 或 Mermaid Live');
+    }).catch(() => {
+        showToast('複製失敗', 'warn');
+    });
+}
+
+function copyAcademicFigurePrompt() {
+    const el = document.getElementById('diagramAcademicPrompt');
+    if (!el || !el.innerText) {
+        showToast('尚無繪圖 Prompt', 'warn');
+        return;
+    }
+    navigator.clipboard.writeText(el.innerText).then(() => {
+        showToast('🎨 已複製學術配圖 Prompt！可直接貼至 Midjourney / DALL-E / Gemini');
+    }).catch(() => {
+        showToast('複製失敗', 'warn');
+    });
+}
+
+function escapeHtml(str) {
+    if (!str) return '';
+    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
